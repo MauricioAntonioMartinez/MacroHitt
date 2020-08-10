@@ -1,32 +1,26 @@
 import 'package:flutter/material.dart';
-import '../Model/Meal.dart';
+import '../bloc/Model/model.dart';
 import '../Widgets/Meals.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../Widgets/Controls/Macros.dart';
+import '../bloc/Track/track_bloc.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class Tracking extends StatefulWidget {
+  final String date;
+  final Map<MealGroupName, List<MealItem>> meals;
+  final Macro macroTarget;
+  Tracking({this.date, this.macroTarget, this.meals});
   @override
   _Tracking createState() => _Tracking();
 }
 
 class _Tracking extends State<Tracking> {
-  final MacroDay mealday =
-      MacroDay(date: DateTime.now(), goals: Macro(20, 50, 100), meals: [
-    Meal('Breakfast', [
-      MealItem(mealName: 'Ensalada', carbs: 23, fats: 20, protein: 23),
-      MealItem(mealName: 'Ensalada', carbs: 23, fats: 20, protein: 23),
-      MealItem(mealName: 'Ensalada', carbs: 23, fats: 20, protein: 23)
-    ]),
-    Meal('Lunch', [
-      MealItem(mealName: 'Ensalada', carbs: 23, fats: 20, protein: 23),
-      MealItem(mealName: 'Ensalada', carbs: 23, fats: 20, protein: 23),
-      MealItem(mealName: 'Ensalada', carbs: 23, fats: 20, protein: 23)
-    ]),
-    Meal('Dinner', [
-      MealItem(mealName: 'Ensalada', carbs: 23, fats: 20, protein: 23),
-      MealItem(mealName: 'Ensalada', carbs: 23, fats: 20, protein: 23),
-      MealItem(mealName: 'Ensalada', carbs: 23, fats: 20, protein: 23)
-    ])
-  ]);
+  var meals;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +29,42 @@ class _Tracking extends State<Tracking> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Macros(),
-          Expanded(
-              child: ListView(
-            children: <Widget>[
-              ...mealday.meals.map((meal) => MealWidget(meal))
+          CarouselSlider(
+            options: CarouselOptions(
+              height: 130,
+              autoPlay: false,
+              viewportFraction: 0.9,
+              enableInfiniteScroll: false,
+              enlargeCenterPage: false,
+            ),
+            items: [
+              Macros(
+                  goals: widget.macroTarget,
+                  consumed: Macro(30, 23, 55),
+                  isInverse: true),
+              Macros(
+                  goals: widget.macroTarget,
+                  consumed: Macro(30, 23, 55),
+                  isInverse: false),
             ],
-          )),
+          ),
+          Expanded(
+              child: ListView.builder(
+                  itemBuilder: (ctx, i) {
+                    String grpName;
+                    var groupName = widget.meals.keys.toList()[i];
+                    if (groupName == MealGroupName.BreakFast) {
+                      grpName = 'BreakFast';
+                    } else if (groupName == MealGroupName.Dinner) {
+                      grpName = 'Dinner';
+                    } else if (groupName == MealGroupName.Lunch) {
+                      grpName = 'Lunch';
+                    } else if (groupName == MealGroupName.Snack) {
+                      grpName = 'Snack';
+                    }
+                    return MealWidget(widget.meals[groupName], grpName);
+                  },
+                  itemCount: widget.meals.length)),
         ],
       ),
     );

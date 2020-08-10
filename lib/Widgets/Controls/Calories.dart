@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Calorie extends StatelessWidget {
+  final bool isInverse;
+
+  Calorie(this.isInverse);
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -11,12 +15,23 @@ class Calorie extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            Container(
-              width: double.infinity,
-              color: Colors.red,
-              height: 1,
+            Stack(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  color: Colors.red,
+                  height: 1,
+                ),
+                Container(
+                  width: double.infinity,
+                  color: Colors.green,
+                  height: 0.5,
+                )
+              ],
             ),
-            Text('Calories Consumed: 00.00')
+            Text(isInverse
+                ? 'Calories Consumed: 00.00'
+                : 'Calories Remaining: 00.00')
           ],
         ),
       ),

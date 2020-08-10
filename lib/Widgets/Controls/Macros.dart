@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import './Calories.dart';
+import '../../bloc/Model/model.dart';
 
 class Macros extends StatelessWidget {
+  final Macro goals;
+  final Macro consumed;
+  final bool isInverse;
+  Macros({this.goals, this.consumed, this.isInverse});
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -26,7 +31,10 @@ class Macros extends StatelessWidget {
                                   BorderSide(color: Colors.grey, width: 0.5))),
                       child: Column(children: <Widget>[
                         Text(
-                          '0.0',
+                          (isInverse
+                                  ? consumed.protein
+                                  : goals.protein - consumed.protein)
+                              .toStringAsFixed(1),
                           style: Theme.of(context).textTheme.title,
                         ),
                         Text(
@@ -45,7 +53,10 @@ class Macros extends StatelessWidget {
                                   BorderSide(color: Colors.grey, width: 0.5))),
                       child: Column(children: <Widget>[
                         Text(
-                          '0.0',
+                          (isInverse
+                                  ? consumed.fats
+                                  : goals.fats - consumed.fats)
+                              .toStringAsFixed(1),
                           style: Theme.of(context).textTheme.title,
                         ),
                         Text(
@@ -60,7 +71,10 @@ class Macros extends StatelessWidget {
                       padding: EdgeInsets.only(right: 10),
                       child: Column(children: <Widget>[
                         Text(
-                          '0.0',
+                          (isInverse
+                                  ? consumed.carbs
+                                  : goals.carbs - consumed.carbs)
+                              .toStringAsFixed(1),
                           style: Theme.of(context).textTheme.title,
                         ),
                         Text(
@@ -76,7 +90,7 @@ class Macros extends StatelessWidget {
               ),
             ),
             Container(
-              child: Calorie(),
+              child: Calorie(isInverse),
               height: 40,
             )
           ],
