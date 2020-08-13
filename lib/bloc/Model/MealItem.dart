@@ -4,10 +4,10 @@ class MealItem extends Macro {
   final String id;
   final String mealName;
   final String servingName;
-  final double servingSize;
-  final double protein;
-  final double carbs;
-  final double fats;
+  double servingSize;
+  double protein;
+  double carbs;
+  double fats;
 
   MealItem(
       {@required this.id,
@@ -18,6 +18,15 @@ class MealItem extends Macro {
       @required this.servingName,
       @required this.servingSize})
       : super(protein, carbs, fats);
+
+  MealItem updateServingSize(double newQty) {
+    final oldServingSize = this.servingSize;
+    this.servingSize = newQty;
+    this.carbs = (this.carbs / oldServingSize) * newQty;
+    this.protein = (this.protein / oldServingSize) * newQty;
+    this.fats = (this.fats / oldServingSize) * newQty;
+    return this;
+  }
 }
 
 final myMeal = MealItem(

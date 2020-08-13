@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../bloc/Model/model.dart';
 import '../Widgets/Meals.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../Widgets/Controls/Macros.dart';
-import '../bloc/Track/track_bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class Tracking extends StatefulWidget {
@@ -17,10 +15,6 @@ class Tracking extends StatefulWidget {
 
 class _Tracking extends State<Tracking> {
   var meals;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,18 +45,8 @@ class _Tracking extends State<Tracking> {
           Expanded(
               child: ListView.builder(
                   itemBuilder: (ctx, i) {
-                    String grpName;
                     var groupName = widget.meals.keys.toList()[i];
-                    if (groupName == MealGroupName.BreakFast) {
-                      grpName = 'BreakFast';
-                    } else if (groupName == MealGroupName.Dinner) {
-                      grpName = 'Dinner';
-                    } else if (groupName == MealGroupName.Lunch) {
-                      grpName = 'Lunch';
-                    } else if (groupName == MealGroupName.Snack) {
-                      grpName = 'Snack';
-                    }
-                    return MealWidget(widget.meals[groupName], grpName);
+                    return MealWidget(widget.meals[groupName], groupName);
                   },
                   itemCount: widget.meals.length)),
         ],

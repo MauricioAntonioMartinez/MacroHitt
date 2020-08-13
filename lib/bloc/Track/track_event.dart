@@ -20,11 +20,12 @@ class TrackAddMeal extends TrackEvent {
 }
 
 class TrackEditMeal extends TrackEvent {
-  final MealTrack mealItem;
-  const TrackEditMeal(this.mealItem);
-
+  final MealItem meal;
+  final MealGroupName newGroupName;
+  final MealGroupName oldGroupName;
+  const TrackEditMeal(this.meal, this.newGroupName, this.oldGroupName);
   @override
-  List<Object> get props => [mealItem];
+  List<Object> get props => [meal, newGroupName, oldGroupName];
 }
 
 class TrackRemoveMeal extends TrackEvent {

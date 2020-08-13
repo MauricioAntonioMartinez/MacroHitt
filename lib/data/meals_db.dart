@@ -19,7 +19,7 @@ List<MealItem> myMeals = [
       servingSize: 1),
   MealItem(
       id: '3',
-      mealName: 'Frijoles',
+      mealName: 'Pulpa',
       carbs: 0.8,
       fats: 0.8,
       protein: 0.8,
@@ -27,7 +27,7 @@ List<MealItem> myMeals = [
       servingSize: 1),
   MealItem(
       id: '4',
-      mealName: 'Ensalada',
+      mealName: 'Pan',
       carbs: 0.55,
       fats: 0.9,
       protein: 0.85,
@@ -35,7 +35,7 @@ List<MealItem> myMeals = [
       servingSize: 1),
   MealItem(
       id: '5',
-      mealName: 'Pechuga',
+      mealName: 'Gelatina',
       carbs: 0.8,
       fats: 0.8,
       protein: 0.8,
@@ -44,6 +44,30 @@ List<MealItem> myMeals = [
   MealItem(
       id: '6',
       mealName: 'Frijoles',
+      carbs: 0.8,
+      fats: 0.8,
+      protein: 0.8,
+      servingName: 'grams',
+      servingSize: 1),
+  MealItem(
+      id: '7',
+      mealName: 'Cereales',
+      carbs: 0.8,
+      fats: 0.8,
+      protein: 0.8,
+      servingName: 'grams',
+      servingSize: 1),
+  MealItem(
+      id: '8',
+      mealName: 'Platano',
+      carbs: 0.8,
+      fats: 0.8,
+      protein: 0.8,
+      servingName: 'grams',
+      servingSize: 1),
+  MealItem(
+      id: '9',
+      mealName: 'Fresa',
       carbs: 0.8,
       fats: 0.8,
       protein: 0.8,

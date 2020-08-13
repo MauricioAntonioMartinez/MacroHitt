@@ -42,14 +42,14 @@ List<Track> trakDays = [
       MealTrack(id: '3', qty: 100),
     ],
     MealGroupName.Lunch: [
-      MealTrack(id: '1', qty: 100),
-      MealTrack(id: '2', qty: 100),
-      MealTrack(id: '3', qty: 100),
+      MealTrack(id: '4', qty: 100),
+      MealTrack(id: '5', qty: 100),
+      MealTrack(id: '6', qty: 100),
     ],
     MealGroupName.Dinner: [
-      MealTrack(id: '1', qty: 100),
-      MealTrack(id: '2', qty: 100),
-      MealTrack(id: '3', qty: 100),
+      MealTrack(id: '7', qty: 100),
+      MealTrack(id: '8', qty: 100),
+      MealTrack(id: '9', qty: 100),
     ]
   })
 ];

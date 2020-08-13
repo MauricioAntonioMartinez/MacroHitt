@@ -4,11 +4,21 @@ import 'MealItem.dart';
 
 class MealWidget extends StatelessWidget {
   final List<MealItem> mealGrup;
-  final String mealName;
-  MealWidget(this.mealGrup, this.mealName);
+  final MealGroupName groupName;
+  MealWidget(this.mealGrup, this.groupName);
 
   @override
   Widget build(BuildContext context) {
+    String grpName;
+    if (groupName == MealGroupName.BreakFast) {
+      grpName = 'BreakFast';
+    } else if (groupName == MealGroupName.Dinner) {
+      grpName = 'Dinner';
+    } else if (groupName == MealGroupName.Lunch) {
+      grpName = 'Lunch';
+    } else if (groupName == MealGroupName.Snack) {
+      grpName = 'Snack';
+    }
     final totalCals = mealGrup.fold(0, (acc, meal) => acc + meal.getCalories);
     return Card(
         child: Column(children: <Widget>[
@@ -19,12 +29,14 @@ class MealWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text(mealName, style: Theme.of(context).textTheme.subhead),
-              Text('${totalCals} Kcal',
+              Text(grpName, style: Theme.of(context).textTheme.subhead),
+              Text('${totalCals.toStringAsFixed(1)} Kcal',
                   style: Theme.of(context).textTheme.subhead),
             ],
           )),
-      Column(children: <Widget>[...mealGrup.map((i) => MealItemWidget(i))])
+      Column(children: <Widget>[
+        ...mealGrup.map((i) => MealItemWidget(i, groupName))
+      ])
     ]));
   }
 }

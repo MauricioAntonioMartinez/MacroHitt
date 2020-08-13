@@ -9,7 +9,6 @@ class AddMeal extends StatefulWidget {
 }
 
 class _AddMealState extends State<AddMeal> {
-  int _currentField = 0;
   List<Map<String, dynamic>> _mealInfo = [];
   List<Map<String, dynamic>> _macros = [];
   Map<String, dynamic> newMeal = {};
@@ -36,14 +35,12 @@ class _AddMealState extends State<AddMeal> {
     if (isValid) {
       _form.currentState.save();
       print(newMeal);
+      final servingSize = double.parse(newMeal['servingSize']);
       final thisMeal = MealItem(
           mealName: newMeal['mealName'],
-          carbs: double.parse(newMeal['carbs']) /
-              double.parse(newMeal['servingSize']),
-          fats: double.parse(newMeal['fats']) /
-              double.parse(newMeal['servingSize']),
-          protein: double.parse(newMeal['protein']) /
-              double.parse(newMeal['servingSize']),
+          carbs: double.parse(newMeal['carbs']) / servingSize,
+          fats: double.parse(newMeal['fats']) / servingSize,
+          protein: double.parse(newMeal['protein']) / servingSize,
           servingName: newMeal['servingName'],
           servingSize: 1,
           id: DateTime.now().toString());
@@ -115,131 +112,95 @@ class _AddMealState extends State<AddMeal> {
     ];
   }
 
+  Widget buildTextField(Map e) {
+    return Column(
+      children: <Widget>[
+        Container(
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 120,
+                child: Text(e['label'],
+                    style: Theme.of(context).textTheme.subtitle),
+              ),
+              Container(
+                width: 200,
+                child: TextFormField(
+                  keyboardType: e['keyboard'],
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding: EdgeInsets.all(8),
+                      hintText: e['placeholder']),
+                  validator: e['validator'],
+                  style: Theme.of(context).textTheme.caption,
+                  onChanged: (value) {
+                    print(value);
+                    setState(() {
+                      newMeal[e['field']] = value;
+                    });
+                  },
+                ),
+              ),
+            ],
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          ),
+        ),
+        Divider()
+      ],
+    );
+  }
+
+  Widget buildHeader(String title) {
+    return Container(
+      width: double.infinity,
+      child: Card(
+        margin: EdgeInsets.all(10),
+        child: Container(
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.subhead,
+          ),
+          padding: EdgeInsets.all(10),
+        ),
+        elevation: 2,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _form,
       child: Container(
         padding: EdgeInsets.only(bottom: 30, top: 10, right: 10, left: 10),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  buildHeader('Meal Info'),
+                  ..._mealInfo.map((e) => buildTextField(e)),
+                  buildHeader('Macros'),
+                  ..._macros.map((e) => buildTextField(e)),
+                ],
+                mainAxisAlignment: MainAxisAlignment.center,
+              ),
+            ),
+            Spacer(),
+            Container(
                 width: double.infinity,
-                child: Card(
-                  margin: EdgeInsets.all(10),
-                  child: Container(
-                    child: Text(
-                      'Meal Info',
-                      style: Theme.of(context).textTheme.subhead,
-                    ),
-                    padding: EdgeInsets.all(10),
-                  ),
-                  elevation: 2,
-                ),
-              ),
-              ..._mealInfo.map((e) => Column(
-                    children: <Widget>[
-                      Container(
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              width: 120,
-                              child: Text(e['label'],
-                                  style: Theme.of(context).textTheme.subtitle),
-                            ),
-                            Container(
-                              width: 200,
-                              child: TextFormField(
-                                keyboardType: e['keyboard'],
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.all(8),
-                                    hintText: e['placeholder']),
-                                validator: e['validator'],
-                                style: Theme.of(context).textTheme.caption,
-                                onChanged: (value) {
-                                  print(value);
-                                  setState(() {
-                                    newMeal[e['field']] = value;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        ),
-                      ),
-                      Divider()
-                    ],
-                  )),
-              Container(
-                width: double.infinity,
-                child: Card(
-                  margin: EdgeInsets.all(10),
-                  child: Container(
-                    child: Text(
-                      'Macros',
-                      style: Theme.of(context).textTheme.subhead,
-                    ),
-                    padding: EdgeInsets.all(10),
-                  ),
-                  elevation: 2,
-                ),
-              ),
-              ..._macros.map(
-                (e) => Column(
-                  children: <Widget>[
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Container(
-                            width: 120,
-                            child: Text(e['label'],
-                                style: Theme.of(context).textTheme.subtitle),
-                          ),
-                          Container(
-                            width: 200,
-                            child: TextFormField(
-                              keyboardType: e['keyboard'],
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.all(8),
-                                  hintText: e['placeholder']),
-                              validator: e['validator'],
-                              style: Theme.of(context).textTheme.caption,
-                              onChanged: (value) {
-                                print(value);
-                                setState(() {
-                                  newMeal[e['field']] = value;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      ),
-                    ),
-                    Divider()
-                  ],
-                ),
-              ),
-              Container(
-                  width: double.infinity,
-                  decoration:
-                      BoxDecoration(color: Theme.of(context).primaryColor),
-                  child: FlatButton(
-                    child: Text('Add meal',
-                        style: Theme.of(context).textTheme.subtitle),
-                    onPressed: () {
-                      saveForm();
-                    },
-                  ))
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-          ),
+                decoration:
+                    BoxDecoration(color: Theme.of(context).primaryColor),
+                child: FlatButton(
+                  child: Text('Add meal',
+                      style: Theme.of(context).textTheme.subtitle),
+                  onPressed: () {
+                    saveForm();
+                  },
+                ))
+          ],
         ),
       ),
     );

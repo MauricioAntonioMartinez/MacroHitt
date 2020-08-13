@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import './Tracking.dart';
 import './Add_Meal.dart';
-import './Search_Meal.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -12,8 +12,6 @@ import './search.dart';
 //import 'package:flutter_radial_menu/flutter_radial_menu.dart';
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key key, this.title}) : super(key: key);
-  final String title;
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -26,7 +24,7 @@ class _MainScreenState extends State<MainScreen>
   @override
   void initState() {
     _routes = [
-      {"page": SearchMeal(), 'title': 'Search'},
+      {"page": AddMeal(), 'title': 'Search'},
       {"page": Tracking(), 'title': 'Track Your Meal'},
       {"page": AddMeal(), 'title': 'Add Your Meal'},
     ];
@@ -120,7 +118,8 @@ class _MainScreenState extends State<MainScreen>
               );
             },
             listener: (context, state) {
-              print(state);
+              print('LISTENING');
+
               if (state is TrackLoading) {
                 BlocProvider.of<TrackBloc>(context)
                     .add(TrackLoadDay(DateTime.now()));

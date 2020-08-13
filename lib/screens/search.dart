@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:HIIT/bloc/Model/MealItem.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,86 +66,6 @@ class _SearchState extends State<Search> {
                   'assets/vectors/404.svg',
                   width: 300,
                 ),
-              )
-        // Stack(
-        //     children: <Widget>[
-        //       Align(
-        //         alignment: Alignment.topCenter,
-        //         child: ClipPath(
-        //           clipper: BackgroundClipper(),
-        //           child: Hero(
-        //             tag: 'background',
-        //             child: Container(
-        //               width: MediaQuery.of(context).size.width,
-        //               height:
-        //                   MediaQuery.of(context).size.width * 0.7 * 1.33,
-        //               decoration: BoxDecoration(
-        //                 gradient: LinearGradient(
-        //                   colors: [
-        //                     Theme.of(context).primaryColorDark,
-        //                     Theme.of(context).primaryColorLight
-        //                   ],
-        //                   begin: Alignment.topRight,
-        //                   end: Alignment.bottomLeft,
-        //                 ),
-        //               ),
-        //             ),
-        //           ),
-        //         ),
-        //       ),
-        //       Align(
-        //         alignment: Alignment.topCenter,
-        //         child: Padding(
-        //           padding: EdgeInsets.only(
-        //               top: MediaQuery.of(context).size.width * 0.8 * 0.5),
-        //           child: Hero(
-        //             tag: 'image_hero',
-        //             child: Column(
-        //               children: <Widget>[
-        //                 Text(
-        //                   'No meal not found ',
-        //                   style: TextStyle(fontSize: 35),
-        //                 ),
-        //                 Icon(
-        //                   Icons.not_interested,
-        //                   size: 120,
-        //                 )
-        //               ],
-        //             ),
-        //           ),
-        //         ),
-        //       ),
-        //     ],
-        //   )
-        );
-  }
-}
-
-class BackgroundClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var roundnessFactor = 50.0;
-
-    var path = Path();
-
-    path.moveTo(0, size.height * 0.33);
-    path.lineTo(0, size.height);
-    // path.quadraticBezierTo(0, size.height, roundnessFactor, size.height);
-    path.lineTo(size.width - roundnessFactor, size.height);
-    path.quadraticBezierTo(
-        size.width, size.height, size.width, size.height - roundnessFactor * 2);
-    path.lineTo(size.width, roundnessFactor * 0.5);
-    // path.quadraticBezierTo(size.width - 10, roundnessFactor,
-    //     size.width - roundnessFactor * 1.5, roundnessFactor * 1.5);
-    path.lineTo(roundnessFactor * 0.6, roundnessFactor * 2.25);
-    // path.quadraticBezierTo(
-    //     0, size.height * 0.33, 0, size.height * 0.33 + roundnessFactor);
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return true;
+              ));
   }
 }

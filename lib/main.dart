@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import './bloc/bloc.dart';
 import './BlocObserver.dart';
 import './screens/search.dart';
+import './screens/meal_preview.dart';
 
 void main() {
   Bloc.observer = SimpleBlocObserver();
@@ -33,27 +34,29 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         title: 'Macro Hitt',
         theme: ThemeData(
-            fontFamily: 'Questrial',
             primarySwatch: Colors.teal,
+            accentColor: Colors.blueAccent,
+            fontFamily: 'Questrial',
             textTheme: ThemeData.light().textTheme.copyWith(
-                caption: TextStyle(fontSize: 16),
-                title: TextStyle(
-                    fontFamily: 'NotoSans',
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(204, 0, 11, 0.8)),
-                subtitle: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300),
-                subhead: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Questrial'))),
-        initialRoute: '/',
+                  caption: TextStyle(fontSize: 16),
+                  title: TextStyle(
+                      fontFamily: 'NotoSans',
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(204, 0, 11, 0.8)),
+                  subtitle: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w300),
+                  subhead: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Questrial'),
+                )),
+        home: MainScreen(),
         routes: {
-          '/': (ctx) => MainScreen(),
-          Search.routeName: (ctx) => Search()
+          Search.routeName: (ctx) => Search(),
+          MealPreview.routeName: (ctx) => MealPreview()
         },
         onGenerateRoute: (settings) {
           print(settings);

@@ -8,11 +8,11 @@ class Macro {
   }
 
   double get getCarbs {
-    return this.protein * 4;
+    return this.carbs * 4;
   }
 
   double get getFats {
-    return this.protein * 9;
+    return this.fats * 9;
   }
 
   double get getCalories {
