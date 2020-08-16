@@ -2,114 +2,75 @@ import 'package:flutter/material.dart';
 import '../bloc/Model/model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
+import '../inputs/create-meal.dart';
 
 class AddMeal extends StatefulWidget {
+  final Map<String, dynamic> mealFields;
+  AddMeal(this.mealFields);
   @override
   _AddMealState createState() => _AddMealState();
 }
 
 class _AddMealState extends State<AddMeal> {
-  List<Map<String, dynamic>> _mealInfo = [];
-  List<Map<String, dynamic>> _macros = [];
+  List<Map<String, dynamic>> _mealInfo = mealInfo({});
+  List<Map<String, dynamic>> _macros = macros({});
+  List<Map<String, dynamic>> _details = details({});
+  var _isEditMode = false;
   Map<String, dynamic> newMeal = {};
   final _form = GlobalKey<FormState>();
-  static String _numberValidator(String value) {
-    if (value.trim().isEmpty) {
-      return 'Field required';
-    } else if (double.tryParse(value) == null)
-      return 'Invalid input';
-    else if (double.tryParse(value) < 0) return 'Must be positive';
-    return null;
-  }
-
-  static String _textValidator(String value) {
-    if (value.isEmpty) {
-      return 'Field required';
-    } else if (value.length < 5) return 'Value too short';
-    return null;
-  }
-
-  void saveForm() {
-    final isValid = _form.currentState.validate();
-    print(isValid);
-    if (isValid) {
-      _form.currentState.save();
-      print(newMeal);
-      final servingSize = double.parse(newMeal['servingSize']);
-      final thisMeal = MealItem(
-          mealName: newMeal['mealName'],
-          carbs: double.parse(newMeal['carbs']) / servingSize,
-          fats: double.parse(newMeal['fats']) / servingSize,
-          protein: double.parse(newMeal['protein']) / servingSize,
-          servingName: newMeal['servingName'],
-          servingSize: 1,
-          id: DateTime.now().toString());
-      BlocProvider.of<MealBloc>(context).add(MealAdd(thisMeal));
-      Scaffold.of(context).showSnackBar(SnackBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        content: Text('Successfully Added'),
-      ));
-      // Navigator.of(context).pop();
-      _form.currentState.reset();
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    _mealInfo = [
-      {
-        'field': 'mealName',
-        'label': 'Meal Name',
-        'placeholder': 'Eggs ...',
-        'validator': _textValidator,
-        'keyboard': TextInputType.text,
-      },
-      {
-        'field': 'brandName',
-        'label': 'Brand Name',
-        'placeholder': 'San Juan ...',
-        'validator': _textValidator,
-        'keyboard': TextInputType.text,
-      },
-      {
-        'field': 'servingSize',
-        'label': 'Serving Size',
-        'placeholder': '100',
-        'validator': _numberValidator,
-        'keyboard': TextInputType.number,
-      },
-      {
-        'field': 'servingName',
-        'label': 'Serving Name',
-        'placeholder': 'grams',
-        'validator': _textValidator,
-        'keyboard': TextInputType.text,
-      },
-    ];
-    _macros = [
-      {
-        'field': 'protein',
-        'label': 'Protein',
-        'placeholder': '80g',
-        'validator': _numberValidator,
-        'keyboard': TextInputType.number,
-      },
-      {
-        'field': 'carbs',
-        'label': 'Carbs',
-        'placeholder': '20g',
-        'keyboard': TextInputType.number,
-        'validator': _numberValidator,
-      },
-      {
-        'field': 'fats',
-        'label': 'Fats',
-        'placeholder': '5g',
-        'keyboard': TextInputType.number,
-        'validator': _numberValidator,
-      },
-    ];
+    _mealInfo = mealInfo(widget.mealFields);
+    _macros = macros(widget.mealFields);
+    _details = details(widget.mealFields);
+    _isEditMode = !(widget.mealFields.keys.length == 0);
+    newMeal = widget.mealFields;
+  }
+
+  double convertDouble(dynamic value) => value is double
+      ? value
+      : double.tryParse(value) == null ? 0 : double.parse(value);
+
+  void saveForm() {
+    final isValid = _form.currentState.validate();
+
+    if (isValid) {
+      _form.currentState.save();
+      final servingSize = convertDouble(newMeal['servingSize']);
+      final thisMeal = MealItem(
+        id: newMeal['id'],
+        mealName: newMeal['mealName'],
+        brandName: newMeal['brandName'],
+        servingName: newMeal['servingName'],
+        carbs: convertDouble(newMeal['carbs']) / servingSize,
+        fats: convertDouble(newMeal['fats']) / servingSize,
+        protein: convertDouble(newMeal['protein']) / servingSize,
+        monosaturatedFat: newMeal['monosaturatedFat'] != null
+            ? convertDouble(newMeal['monosaturatedFat'])
+            : 0,
+        polyunsaturatedFat: newMeal['polyunsaturatedFat'] != null
+            ? convertDouble(newMeal['polyunsaturatedFat'])
+            : 0,
+        saturatedFat: newMeal['saturatedFat'] != null
+            ? convertDouble(newMeal['saturatedFat'])
+            : 0,
+        sugar: newMeal['sugar'] != null ? convertDouble(newMeal['sugar']) : 0.0,
+        fiber: newMeal['fiber'] != null ? convertDouble(newMeal['fiber']) : 0.0,
+        servingSize: 1,
+      );
+
+      if (_isEditMode) {
+        print(_isEditMode);
+        BlocProvider.of<MealBloc>(context).add(MealEdit(thisMeal));
+      } else {
+        BlocProvider.of<MealBloc>(context).add(MealAdd(thisMeal));
+        _form.currentState.reset();
+      }
+
+      //Navigator.of(context).pop();
+    }
   }
 
   Widget buildTextField(Map e) {
@@ -126,6 +87,7 @@ class _AddMealState extends State<AddMeal> {
               Container(
                 width: 200,
                 child: TextFormField(
+                  initialValue: _isEditMode ? e['initialValue'].toString() : '',
                   keyboardType: e['keyboard'],
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
@@ -135,7 +97,6 @@ class _AddMealState extends State<AddMeal> {
                   validator: e['validator'],
                   style: Theme.of(context).textTheme.caption,
                   onChanged: (value) {
-                    print(value);
                     setState(() {
                       newMeal[e['field']] = value;
                     });
@@ -170,37 +131,62 @@ class _AddMealState extends State<AddMeal> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _form,
-      child: Container(
-        padding: EdgeInsets.only(bottom: 30, top: 10, right: 10, left: 10),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SingleChildScrollView(
-              child: Column(
+    return SingleChildScrollView(
+      child: Form(
+        key: _form,
+        child: BlocConsumer<MealBloc, MealState>(
+          listener: (context, state) {
+            if (state is MealLoadSuccess) {
+              Scaffold.of(context).showSnackBar(SnackBar(
+                backgroundColor: Theme.of(context).primaryColor,
+                content: Text(_isEditMode
+                    ? 'Successfully Updated'
+                    : 'Successfully Added'),
+              ));
+            }
+          },
+          builder: (context, state) {
+            if (state is MealLoadSuccess) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  buildHeader('Meal Info'),
-                  ..._mealInfo.map((e) => buildTextField(e)),
-                  buildHeader('Macros'),
-                  ..._macros.map((e) => buildTextField(e)),
+                  Column(
+                    children: <Widget>[
+                      buildHeader('Meal Info'),
+                      ..._mealInfo.map((e) => buildTextField(e)),
+                      buildHeader('Macros'),
+                      ..._macros.map((e) => buildTextField(e)),
+                      buildHeader('Details (optional)'),
+                      ..._details.map((e) => buildTextField(e)),
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor),
+                        child: FlatButton(
+                          child: Text(_isEditMode ? 'Update Meal' : 'Add Meal',
+                              style: Theme.of(context).textTheme.subtitle),
+                          onPressed: () {
+                            saveForm();
+                          },
+                        )),
+                  )
                 ],
-                mainAxisAlignment: MainAxisAlignment.center,
-              ),
-            ),
-            Spacer(),
-            Container(
-                width: double.infinity,
-                decoration:
-                    BoxDecoration(color: Theme.of(context).primaryColor),
-                child: FlatButton(
-                  child: Text('Add meal',
-                      style: Theme.of(context).textTheme.subtitle),
-                  onPressed: () {
-                    saveForm();
-                  },
-                ))
-          ],
+              );
+            }
+            if (state is MealLoading) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          },
         ),
       ),
     );

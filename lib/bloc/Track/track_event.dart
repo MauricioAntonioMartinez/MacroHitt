@@ -30,8 +30,10 @@ class TrackEditMeal extends TrackEvent {
 
 class TrackRemoveMeal extends TrackEvent {
   final String id;
-  const TrackRemoveMeal(this.id);
+  final MealGroupName mealGroupName;
+
+  const TrackRemoveMeal(this.id, this.mealGroupName);
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [id, mealGroupName];
 }

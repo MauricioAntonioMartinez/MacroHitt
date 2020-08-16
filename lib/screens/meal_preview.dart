@@ -5,6 +5,8 @@ import '../bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/Model/model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../Widgets/UI/BottomButton.dart';
+import './EditMeal.dart';
 
 class MealPreview extends StatefulWidget {
   static const routeName = '/meal-preview';
@@ -47,20 +49,18 @@ class _MealPreviewState extends State<MealPreview> {
     );
   }
 
-  void bottomModalSheet() {
+  void bottomModalSheet(List<dynamic> items, Function cb, String splitPart) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
         return Container(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: MealGroupName.values
-                .map((e) => GestureDetector(
+            children: items
+                .map((i) => GestureDetector(
                     onTap: () {
-                      setState(() {
-                        groupName = e;
-                        Navigator.of(context).pop();
-                      });
+                      Navigator.of(context).pop();
+                      cb(i);
                     },
                     child: Container(
                       child: Column(
@@ -70,7 +70,7 @@ class _MealPreviewState extends State<MealPreview> {
                             width: double.infinity,
                             padding: EdgeInsets.all(8),
                             child: Text(
-                              e.toString().split('MealGroupName.')[1],
+                              i.toString().split(splitPart)[1],
                               style: Theme.of(context).textTheme.subtitle,
                             ),
                           ),
@@ -101,12 +101,18 @@ class _MealPreviewState extends State<MealPreview> {
           "color": Theme.of(context).errorColor,
           "details": [
             {
-              "Saturated Fat": 0,
+              "Saturated Fat":
+                  meal.saturatedFat == null ? 0.0 : meal.saturatedFat,
             },
             {
-              "Monosaturated Fat": 0,
+              "Monosaturated Fat":
+                  meal.monosaturatedFat == null ? 0.0 : meal.monosaturatedFat,
             },
-            {"Polyunsaturated Fat": 0},
+            {
+              "Polyunsaturated Fat": meal.polyunsaturatedFat == null
+                  ? 0.0
+                  : meal.polyunsaturatedFat
+            },
           ],
         },
         {
@@ -115,16 +121,15 @@ class _MealPreviewState extends State<MealPreview> {
           "color": Colors.blue,
           "details": [
             {
-              "Sugar": 0,
+              "Sugar": meal.sugar == null ? 0.0 : meal.sugar,
             },
             {
-              "Fiber": 0,
+              "Fiber": meal.fiber == null ? 0.0 : meal.fiber,
             },
           ],
         },
         {"label": "Protein", "value": meal.getProtein, 'color': Colors.green},
         {"label": "Sodium", "value": 0},
-        {"label": "Sugar", "value": 0},
       ];
 
     return Scaffold(
@@ -148,7 +153,12 @@ class _MealPreviewState extends State<MealPreview> {
                           Expanded(
                               child: GestureDetector(
                             onTap: () {
-                              bottomModalSheet();
+                              bottomModalSheet(
+                                  MealGroupName.values,
+                                  (e) => setState(() {
+                                        groupName = e;
+                                      }),
+                                  '.');
                             },
                             child: Row(
                               children: <Widget>[
@@ -168,17 +178,27 @@ class _MealPreviewState extends State<MealPreview> {
                             children: <Widget>[
                               IconButton(
                                 icon: Icon(
-                                  Icons.save,
-                                  size: 18,
+                                  Icons.favorite,
+                                  size: 22,
                                 ),
                                 onPressed: () {},
                               ),
                               IconButton(
                                   icon: Icon(
                                     Icons.edit,
-                                    size: 18,
+                                    size: 22,
                                   ),
-                                  onPressed: () {})
+                                  onPressed: () {
+                                    bottomModalSheet(
+                                        [' .Edit Meal', ' .Delete Meal'],
+                                        (value) {
+                                      if (value == ' .Edit Meal') {
+                                        Navigator.of(context).pushNamed(
+                                            EditMeal.routeName,
+                                            arguments: meal);
+                                      }
+                                    }, '.');
+                                  })
                             ],
                           )
                         ],
@@ -201,7 +221,7 @@ class _MealPreviewState extends State<MealPreview> {
                             ),
                             Padding(
                               padding: const EdgeInsets.all(5),
-                              child: Text('Ensalada Rusa',
+                              child: Text(meal.mealName,
                                   style: TextStyle(
                                       fontFamily: 'Questrial',
                                       color: Theme.of(context).primaryColor,
@@ -266,7 +286,7 @@ class _MealPreviewState extends State<MealPreview> {
                                     margin: EdgeInsets.only(left: 10),
                                     child: Column(
                                       children: ((e['details']
-                                              as List<Map<String, int>>)
+                                              as List<Map<String, double>>)
                                           .map((e) {
                                         final key = e.keys.toList()[0];
                                         return buildExpanend(
@@ -283,21 +303,11 @@ class _MealPreviewState extends State<MealPreview> {
                 ),
               ),
             ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-        child: RaisedButton(
-            color: Theme.of(context).primaryColor,
-            onPressed: () {
-              BlocProvider.of<TrackBloc>(context).add(
-                  TrackEditMeal(meal, groupName, mealSelected['groupName']));
-              Navigator.of(context).pop();
-            },
-            child: Text('Add Meal',
-                style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Questrial'))),
-      ),
+      bottomNavigationBar: BottomButton(() {
+        BlocProvider.of<TrackBloc>(context)
+            .add(TrackEditMeal(meal, groupName, mealSelected['groupName']));
+        Navigator.of(context).pop();
+      }),
     );
   }
 }

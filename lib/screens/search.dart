@@ -58,7 +58,7 @@ class _SearchState extends State<Search> {
         ),
         body: meals.length > 0
             ? ListView.builder(
-                itemBuilder: (context, i) => MealItemWidget(meals[i]),
+                itemBuilder: (context, i) => MealItemWidget(meals[i], false),
                 itemCount: meals.length,
               )
             : Center(

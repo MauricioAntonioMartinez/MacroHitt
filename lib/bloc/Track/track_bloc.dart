@@ -28,6 +28,28 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
       yield* _mapTrackDayToState(event);
     } else if (event is TrackEditMeal) {
       yield* _editMealTrack(event);
+    } else if (event is TrackRemoveMeal) {
+      yield* _removeMealTrack(event);
+    }
+  }
+
+  Stream<TrackState> _removeMealTrack(TrackRemoveMeal event) async* {
+    //yield TrackLoading();
+    try {
+      final day = (state as TrackLoadDaySuccess);
+      final mealGroupName = event.mealGroupName;
+      final newMeals = day.meals;
+      print(newMeals[mealGroupName]);
+      newMeals[mealGroupName].removeWhere((meal) => meal.id == event.id);
+      print(newMeals[mealGroupName]);
+
+      if (newMeals[mealGroupName].isEmpty)
+        newMeals.removeWhere((key, value) => key == mealGroupName);
+
+      yield TrackLoadDaySuccess(
+          date: day.date, macroTarget: day.macroTarget, meals: newMeals);
+    } catch (e) {
+      yield TrackLoadedFailure('CANNOT DELETE MEAL');
     }
   }
 

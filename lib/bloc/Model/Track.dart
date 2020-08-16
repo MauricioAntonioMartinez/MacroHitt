@@ -21,9 +21,15 @@ class Track extends Macro {
             carbs: (mealItem.carbs * qty),
             protein: mealItem.protein * qty,
             fats: mealItem.fats * qty,
+            brandName: mealItem.brandName,
             mealName: mealItem.mealName,
             servingName: mealItem.servingName,
-            servingSize: mealItem.servingSize * qty);
+            servingSize: mealItem.servingSize * qty,
+            monosaturatedFat: mealItem.monosaturatedFat,
+            polyunsaturatedFat: mealItem.polyunsaturatedFat,
+            saturatedFat: mealItem.saturatedFat,
+            sugar: mealItem.sugar,
+            fiber: mealItem.fiber);
       }).toList();
     });
     return finalMeals;

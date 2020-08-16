@@ -35,7 +35,7 @@ class MealWidget extends StatelessWidget {
             ],
           )),
       Column(children: <Widget>[
-        ...mealGrup.map((i) => MealItemWidget(i, groupName))
+        ...mealGrup.map((i) => MealItemWidget(i, true, groupName))
       ])
     ]));
   }

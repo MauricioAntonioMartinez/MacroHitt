@@ -1,3 +1,4 @@
+import 'package:HIIT/Widgets/NoTrack.dart';
 import 'package:flutter/material.dart';
 import '../bloc/Model/model.dart';
 import '../Widgets/Meals.dart';
@@ -14,14 +15,13 @@ class Tracking extends StatefulWidget {
 }
 
 class _Tracking extends State<Tracking> {
-  var meals;
-
   @override
   Widget build(BuildContext context) {
+    final isTrackDayEmpty = widget.meals.keys.length == 0;
     return Center(
       heightFactor: 1,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: isTrackDayEmpty ? MainAxisSize.max : MainAxisSize.min,
         children: <Widget>[
           CarouselSlider(
             options: CarouselOptions(
@@ -42,13 +42,15 @@ class _Tracking extends State<Tracking> {
                   isInverse: false),
             ],
           ),
-          Expanded(
-              child: ListView.builder(
-                  itemBuilder: (ctx, i) {
-                    var groupName = widget.meals.keys.toList()[i];
-                    return MealWidget(widget.meals[groupName], groupName);
-                  },
-                  itemCount: widget.meals.length)),
+          isTrackDayEmpty
+              ? NoTrack()
+              : Expanded(
+                  child: ListView.builder(
+                      itemBuilder: (ctx, i) {
+                        var groupName = widget.meals.keys.toList()[i];
+                        return MealWidget(widget.meals[groupName], groupName);
+                      },
+                      itemCount: widget.meals.length)),
         ],
       ),
     );

@@ -23,13 +23,14 @@ class _MainScreenState extends State<MainScreen>
   final CarouselController _controller = CarouselController();
   @override
   void initState() {
-    _routes = [
-      {"page": AddMeal(), 'title': 'Search'},
-      {"page": Tracking(), 'title': 'Track Your Meal'},
-      {"page": AddMeal(), 'title': 'Add Your Meal'},
-    ];
-
     super.initState();
+    Future.delayed(Duration.zero).then((value) =>
+        BlocProvider.of<TrackBloc>(context).add(TrackLoadDay(DateTime.now())));
+    _routes = [
+      {"page": AddMeal({}), 'title': 'Search'},
+      {"page": Tracking(), 'title': 'Track Your Meal'},
+      {"page": AddMeal({}), 'title': 'Add Your Meal'},
+    ];
   }
   // title: Text(_routes[_currentIndex]['title']),
 
@@ -71,7 +72,7 @@ class _MainScreenState extends State<MainScreen>
             //print(state.myMeals);
             //  BlocProvider.of<MealBloc>(context).add(MealLoad());
           }
-          return BlocConsumer<TrackBloc, TrackState>(
+          return BlocBuilder<TrackBloc, TrackState>(
             builder: (context, state) {
               //print(state);
               Widget currentWidget;
@@ -114,16 +115,8 @@ class _MainScreenState extends State<MainScreen>
                   enableInfiniteScroll: false,
                   enlargeCenterPage: false,
                 ),
-                items: [AddMeal(), currentWidget, AddMeal()],
+                items: [AddMeal({}), currentWidget, AddMeal({})],
               );
-            },
-            listener: (context, state) {
-              print('LISTENING');
-
-              if (state is TrackLoading) {
-                BlocProvider.of<TrackBloc>(context)
-                    .add(TrackLoadDay(DateTime.now()));
-              }
             },
           );
         },

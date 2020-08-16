@@ -1,22 +1,34 @@
 import './model.dart';
 
 class MealItem extends Macro {
-  final String id;
+  String id;
   final String mealName;
   final String servingName;
+  final String brandName;
   double servingSize;
   double protein;
   double carbs;
   double fats;
+  final double fiber;
+  final double sugar;
+  final double monosaturatedFat;
+  final double polyunsaturatedFat;
+  final double saturatedFat;
 
   MealItem(
-      {@required this.id,
+      {this.id,
       @required this.mealName,
       @required this.protein,
       @required this.carbs,
       @required this.fats,
+      @required this.brandName,
       @required this.servingName,
-      @required this.servingSize})
+      @required this.servingSize,
+      this.fiber = 0,
+      this.sugar = 0,
+      this.polyunsaturatedFat = 0,
+      this.saturatedFat = 0,
+      this.monosaturatedFat = 0})
       : super(protein, carbs, fats);
 
   MealItem updateServingSize(double newQty) {
@@ -27,13 +39,25 @@ class MealItem extends Macro {
     this.fats = (this.fats / oldServingSize) * newQty;
     return this;
   }
-}
 
-final myMeal = MealItem(
-    carbs: 1,
-    fats: 1,
-    protein: 1,
-    mealName: 'Tilapi',
-    id: '1',
-    servingName: 'gram',
-    servingSize: 1);
+  Map<String, dynamic> toMap() {
+    return {
+      'mealName': mealName,
+      'brandName': brandName,
+      'servingName': servingName,
+      'servingSize': servingSize,
+      'protein': protein,
+      'carbs': carbs,
+      'fats': fats,
+      'sugar': sugar,
+      'fiber': fiber,
+      'monosaturatedFat': monosaturatedFat,
+      'polyunsaturatedFat': polyunsaturatedFat,
+      'saturatedFat': saturatedFat
+    };
+  }
+
+  void setId(String id) {
+    this.id = id;
+  }
+}
