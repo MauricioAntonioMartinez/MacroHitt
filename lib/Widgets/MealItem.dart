@@ -19,8 +19,11 @@ class MealItemWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed(MealPreview.routeName,
-            arguments: {"mealId": mealItem.id, "groupName": groupName});
+        Navigator.of(context).pushNamed(MealPreview.routeName, arguments: {
+          "mealId": mealItem.id,
+          "groupName": groupName,
+          "isfromTrack": isDismissible
+        });
       },
       child: Container(
         decoration: BoxDecoration(
@@ -57,10 +60,7 @@ class MealItemWidget extends StatelessWidget {
                                 },
                               )
                             ],
-                          )).then((isDeleted) {
-                    // DELETE BLOC EVENT
-                    return isDeleted;
-                  });
+                          )).then((isDeleted) => isDeleted);
                 },
                 onDismissed: (_) {
                   BlocProvider.of<TrackBloc>(context)

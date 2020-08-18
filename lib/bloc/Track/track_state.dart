@@ -16,10 +16,11 @@ class TrackMealTrackGroupLoadedSuccess extends TrackState {
 }
 
 class TrackLoadDaySuccess extends TrackState {
-  final String date;
-  final Map<MealGroupName, List<MealItem>> meals;
-  final Macro macroTarget;
-  TrackLoadDaySuccess({this.date, this.macroTarget, this.meals});
+  final Track trackDay;
+  // final String date;
+  // final Map<MealGroupName, List<MealItem>> meals;
+  // final Macro macroTarget;
+  TrackLoadDaySuccess(this.trackDay);
 }
 
 class TrackLoading extends TrackState {}

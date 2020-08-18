@@ -3,16 +3,18 @@ import './model.dart';
 enum MealGroupName { BreakFast, Lunch, Dinner, Snack }
 
 class Track extends Macro {
-  Map<MealGroupName, List<MealTrack>> mealGroup = {};
+  Map<MealGroupName, List<MealItem>> meals = {};
+  Map<MealGroupName, List<MealTrack>> mealsTrack = {};
   final DateTime date;
-  Macro goals;
-  Track({this.mealGroup, this.date, this.goals})
-      : super(goals.protein, goals.carbs, goals.fats);
+  Macro macrosConsumed;
+  Track({this.meals, this.date, this.macrosConsumed})
+      : super(
+            macrosConsumed.protein, macrosConsumed.carbs, macrosConsumed.fats);
 
   Map<MealGroupName, List<MealItem>> trackMealsToItemMeals(
       List<MealItem> userMeals) {
     Map<MealGroupName, List<MealItem>> finalMeals = {};
-    this.mealGroup.forEach((key, trackMeals) {
+    this.mealsTrack.forEach((key, trackMeals) {
       finalMeals[key] = trackMeals.map((mealTrack) {
         final mealItem = userMeals.firstWhere((m) => m.id == mealTrack.id);
         final qty = mealTrack.qty;
@@ -32,32 +34,33 @@ class Track extends Macro {
             fiber: mealItem.fiber);
       }).toList();
     });
+    this.meals = finalMeals;
     return finalMeals;
   }
 
   double get getTotalCalories {
-    return this.mealGroup.values.toList().fold(
+    return this.meals.values.toList().fold(
         0,
         (acc, meals) =>
             acc + 1.1); //meals.fold(0, (acc, meal) => meal.getCalories));
   }
 
   double get getProtein {
-    return this.mealGroup.values.toList().fold(
+    return this.meals.values.toList().fold(
         0,
         (acc, meal) =>
             acc + 1.1); //meal.fold(0, (acc, meal) => meal.getProtein));
   }
 
   double get getCarbs {
-    return this.mealGroup.values.toList().fold(
+    return this.meals.values.toList().fold(
         0,
         (acc, meal) =>
             acc + 1.1); //meal.fold(0, (acc, meal) => meal.getCarbs));
   }
 
   double get getFats {
-    return this.mealGroup.values.toList().fold(0,
+    return this.meals.values.toList().fold(0,
         (acc, meal) => acc + 1.1); //meal.fold(0, (acc, meal) => meal.getFats));
   }
 }

@@ -5,19 +5,15 @@ import '../Widgets/Meals.dart';
 import '../Widgets/Controls/Macros.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-class Tracking extends StatefulWidget {
-  final String date;
+class Tracking extends StatelessWidget {
   final Map<MealGroupName, List<MealItem>> meals;
-  final Macro macroTarget;
-  Tracking({this.date, this.macroTarget, this.meals});
-  @override
-  _Tracking createState() => _Tracking();
-}
+  final Macro macrosConsumed;
+  final Macro goals;
+  Tracking({this.macrosConsumed, this.meals, this.goals});
 
-class _Tracking extends State<Tracking> {
   @override
   Widget build(BuildContext context) {
-    final isTrackDayEmpty = widget.meals.keys.length == 0;
+    final isTrackDayEmpty = meals.keys.length == 0;
     return Center(
       heightFactor: 1,
       child: Column(
@@ -33,12 +29,12 @@ class _Tracking extends State<Tracking> {
             ),
             items: [
               Macros(
-                  goals: widget.macroTarget,
-                  consumed: Macro(30, 23, 55),
+                  goals: goals,
+                  macrosConsumed: macrosConsumed,
                   isInverse: true),
               Macros(
-                  goals: widget.macroTarget,
-                  consumed: Macro(30, 23, 55),
+                  goals: goals,
+                  macrosConsumed: macrosConsumed,
                   isInverse: false),
             ],
           ),
@@ -47,10 +43,10 @@ class _Tracking extends State<Tracking> {
               : Expanded(
                   child: ListView.builder(
                       itemBuilder: (ctx, i) {
-                        var groupName = widget.meals.keys.toList()[i];
-                        return MealWidget(widget.meals[groupName], groupName);
+                        var groupName = meals.keys.toList()[i];
+                        return MealWidget(meals[groupName], groupName);
                       },
-                      itemCount: widget.meals.length)),
+                      itemCount: meals.length)),
         ],
       ),
     );

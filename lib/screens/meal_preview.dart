@@ -19,7 +19,7 @@ class _MealPreviewState extends State<MealPreview> {
   final newQtyController = TextEditingController();
   MealGroupName groupName;
   MealItem meal;
-
+  var isTrack = false;
   Map mealSelected;
 
   @override
@@ -32,13 +32,32 @@ class _MealPreviewState extends State<MealPreview> {
           (BlocProvider.of<MealBloc>(context).state as MealLoadSuccess).myMeals;
       groupName = MealGroupName.BreakFast;
     } else {
+      isTrack = true;
       meals = (BlocProvider.of<TrackBloc>(context).state as TrackLoadDaySuccess)
+          .trackDay
           .meals[mealSelected['groupName']];
       groupName = mealSelected['groupName'];
     }
-    if (meals != null)
-      meal = meals.firstWhere((e) => e.id == mealSelected['mealId'],
+    if (meals != null) {
+      final mealFetched = meals.firstWhere(
+          (e) => e.id == mealSelected['mealId'],
           orElse: () => null);
+      if (mealFetched != null)
+        meal = MealItem(
+            brandName: mealFetched.brandName,
+            servingSize: mealFetched.servingSize,
+            carbs: mealFetched.carbs,
+            protein: mealFetched.protein,
+            fats: mealFetched.fats,
+            mealName: mealFetched.mealName,
+            servingName: mealFetched.servingName,
+            fiber: mealFetched.fiber,
+            id: mealFetched.id,
+            monosaturatedFat: mealFetched.monosaturatedFat,
+            polyunsaturatedFat: mealFetched.polyunsaturatedFat,
+            saturatedFat: mealFetched.saturatedFat,
+            sugar: mealFetched.sugar);
+    }
   }
 
   Widget buildExpanend(Widget a, Widget b) {
@@ -196,6 +215,52 @@ class _MealPreviewState extends State<MealPreview> {
                                         Navigator.of(context).pushNamed(
                                             EditMeal.routeName,
                                             arguments: meal);
+                                      } else {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                                  title: Text(
+                                                      'Do you really want to delete this meal?',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .subtitle),
+                                                  actions: <Widget>[
+                                                    BlocListener<TrackBloc,
+                                                        TrackState>(
+                                                      listener:
+                                                          (context, state) {},
+                                                      child: FlatButton(
+                                                        child: Text('Yes'),
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop(true);
+                                                        },
+                                                      ),
+                                                    ),
+                                                    FlatButton(
+                                                      child: Text('No',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.red)),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop(false);
+                                                      },
+                                                    )
+                                                  ],
+                                                )).then((isDeleted) {
+                                          if (isDeleted) {
+                                            Navigator.of(context).pop();
+                                            isTrack
+                                                ? BlocProvider.of<TrackBloc>(
+                                                        context)
+                                                    .add(TrackRemoveMeal(
+                                                        meal.id, groupName))
+                                                : BlocProvider.of<MealBloc>(
+                                                        context)
+                                                    .add(MealDelete(meal.id));
+                                          }
+                                        });
                                       }
                                     }, '.');
                                   })

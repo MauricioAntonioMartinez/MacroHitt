@@ -4,9 +4,9 @@ import '../../bloc/Model/model.dart';
 
 class Macros extends StatelessWidget {
   final Macro goals;
-  final Macro consumed;
+  final Macro macrosConsumed;
   final bool isInverse;
-  Macros({this.goals, this.consumed, this.isInverse});
+  Macros({this.goals, this.macrosConsumed, this.isInverse});
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -32,8 +32,8 @@ class Macros extends StatelessWidget {
                       child: Column(children: <Widget>[
                         Text(
                           (isInverse
-                                  ? consumed.protein
-                                  : goals.protein - consumed.protein)
+                                  ? macrosConsumed.protein
+                                  : goals.protein - macrosConsumed.protein)
                               .toStringAsFixed(1),
                           style: Theme.of(context).textTheme.title,
                         ),
@@ -54,8 +54,8 @@ class Macros extends StatelessWidget {
                       child: Column(children: <Widget>[
                         Text(
                           (isInverse
-                                  ? consumed.fats
-                                  : goals.fats - consumed.fats)
+                                  ? macrosConsumed.fats
+                                  : goals.fats - macrosConsumed.fats)
                               .toStringAsFixed(1),
                           style: Theme.of(context).textTheme.title,
                         ),
@@ -72,8 +72,8 @@ class Macros extends StatelessWidget {
                       child: Column(children: <Widget>[
                         Text(
                           (isInverse
-                                  ? consumed.carbs
-                                  : goals.carbs - consumed.carbs)
+                                  ? macrosConsumed.carbs
+                                  : goals.carbs - macrosConsumed.carbs)
                               .toStringAsFixed(1),
                           style: Theme.of(context).textTheme.title,
                         ),

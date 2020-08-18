@@ -12,9 +12,9 @@ class AddMeal extends StatefulWidget {
 }
 
 class _AddMealState extends State<AddMeal> {
-  List<Map<String, dynamic>> _mealInfo = mealInfo({});
-  List<Map<String, dynamic>> _macros = macros({});
-  List<Map<String, dynamic>> _details = details({});
+  List<Map<String, dynamic>> _mealInfo = [{}];
+  List<Map<String, dynamic>> _macros = [{}];
+  List<Map<String, dynamic>> _details = [{}];
   var _isEditMode = false;
   Map<String, dynamic> newMeal = {};
   final _form = GlobalKey<FormState>();
@@ -25,7 +25,7 @@ class _AddMealState extends State<AddMeal> {
     _mealInfo = mealInfo(widget.mealFields);
     _macros = macros(widget.mealFields);
     _details = details(widget.mealFields);
-    _isEditMode = !(widget.mealFields.keys.length == 0);
+    _isEditMode = (widget.mealFields.keys.length != 0);
     newMeal = widget.mealFields;
   }
 

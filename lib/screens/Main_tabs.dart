@@ -1,9 +1,11 @@
+import 'package:HIIT/bloc/Model/Macro.dart';
+
 import '../Widgets/Main_Drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import './Tracking.dart';
 import './Add_Meal.dart';
-
+import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -20,6 +22,7 @@ class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   List<Map<String, Object>> _routes;
   int _currentIndex = 1;
+  String currentDate = DateFormat.yMMMd().format(DateTime.now());
   final CarouselController _controller = CarouselController();
   @override
   void initState() {
@@ -27,35 +30,10 @@ class _MainScreenState extends State<MainScreen>
     Future.delayed(Duration.zero).then((value) =>
         BlocProvider.of<TrackBloc>(context).add(TrackLoadDay(DateTime.now())));
     _routes = [
-      {"page": AddMeal({}), 'title': 'Search'},
-      {"page": Tracking(), 'title': 'Track Your Meal'},
-      {"page": AddMeal({}), 'title': 'Add Your Meal'},
+      {'title': 'Search'},
+      {},
+      {'title': 'Add Your Meal'},
     ];
-  }
-  // title: Text(_routes[_currentIndex]['title']),
-
-  Widget _searchMeal(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.white,
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(
-            Icons.exit_to_app,
-            color: Theme.of(context).primaryColor,
-          ),
-          onPressed: () {},
-        )
-      ],
-      title: TextFormField(
-        keyboardType: TextInputType.text,
-        decoration: InputDecoration(
-          isDense: true,
-          contentPadding: EdgeInsets.all(8),
-          hintText: 'eggs ...',
-        ),
-        style: Theme.of(context).textTheme.caption,
-      ),
-    );
   }
 
   @override
@@ -63,7 +41,26 @@ class _MainScreenState extends State<MainScreen>
     final double maxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: Text(_routes[_currentIndex]['title']),
+        title: GestureDetector(
+            onTap: () {
+              if (_currentIndex == 1)
+                showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2200))
+                    .then((pickedDate) {
+                  if (pickedDate == null) return;
+                  BlocProvider.of<TrackBloc>(context)
+                      .add(TrackLoadDay(pickedDate));
+                  setState(() {
+                    currentDate = DateFormat.yMMMd().format(pickedDate);
+                  });
+                });
+            },
+            child: Text(_currentIndex == 1
+                ? currentDate
+                : _routes[_currentIndex]['title'])),
       ),
       drawer: MainDrawer(),
       body: BlocBuilder<MealBloc, MealState>(
@@ -77,25 +74,13 @@ class _MainScreenState extends State<MainScreen>
               //print(state);
               Widget currentWidget;
               if (state is TrackLoading) {
-                currentWidget = Center(
-                  child: Column(
-                    children: <Widget>[
-                      Text('Loading'),
-                      FlatButton(
-                          onPressed: () {
-                            BlocProvider.of<TrackBloc>(context)
-                                .add(TrackLoadDay(DateTime.now()));
-                          },
-                          child: Text('ClickMe'))
-                    ],
-                  ),
-                );
+                currentWidget = Center(child: CircularProgressIndicator());
               }
               if (state is TrackLoadDaySuccess) {
                 currentWidget = Tracking(
-                  date: state.date,
-                  macroTarget: state.macroTarget,
-                  meals: state.meals,
+                  macrosConsumed: state.trackDay.macrosConsumed,
+                  meals: state.trackDay.meals,
+                  goals: Macro(20, 20, 20),
                 );
               }
               return CarouselSlider(
@@ -142,7 +127,7 @@ class _MainScreenState extends State<MainScreen>
         height: 56,
         child: CurvedNavigationBar(
           backgroundColor: Theme.of(context).primaryColor,
-          initialIndex: _currentIndex,
+          initialIndex: 1,
           items: <Widget>[
             Icon(
               Icons.settings,

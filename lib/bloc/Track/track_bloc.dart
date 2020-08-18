@@ -14,6 +14,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
   TrackBloc({this.mealBloc}) : super(TrackLoading()) {
     mealTrackGroupSubscription = mealBloc.listen((state) {
       if (state is MealLoadSuccess) {
+        print(state);
         add(TrackLoadDay(DateTime.now()));
       }
     });
@@ -27,38 +28,51 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
     } else if (event is TrackLoadDay) {
       yield* _mapTrackDayToState(event);
     } else if (event is TrackEditMeal) {
-      yield* _editMealTrack(event);
+      yield* _addMealTrack(event);
     } else if (event is TrackRemoveMeal) {
       yield* _removeMealTrack(event);
     }
   }
 
   Stream<TrackState> _removeMealTrack(TrackRemoveMeal event) async* {
-    //yield TrackLoading();
+    final day = (state as TrackLoadDaySuccess); // day cached
+    yield TrackLoading();
     try {
-      final day = (state as TrackLoadDaySuccess);
       final mealGroupName = event.mealGroupName;
-      final newMeals = day.meals;
-      print(newMeals[mealGroupName]);
+      final newMeals = day.trackDay.meals;
       newMeals[mealGroupName].removeWhere((meal) => meal.id == event.id);
-      print(newMeals[mealGroupName]);
-
-      if (newMeals[mealGroupName].isEmpty)
+      if (newMeals[mealGroupName].isEmpty && newMeals != null)
         newMeals.removeWhere((key, value) => key == mealGroupName);
 
-      yield TrackLoadDaySuccess(
-          date: day.date, macroTarget: day.macroTarget, meals: newMeals);
+      final trackDay = Track(
+          date: day.trackDay.date,
+          macrosConsumed: day.trackDay.macrosConsumed,
+          meals: newMeals);
+      yield TrackLoadDaySuccess(trackDay);
     } catch (e) {
       yield TrackLoadedFailure('CANNOT DELETE MEAL');
     }
   }
 
-  Stream<TrackState> _editMealTrack(TrackEditMeal event) async* {
+  Stream<TrackState> _addMealTrack(TrackEditMeal event) async* {
+    final day = (state as TrackLoadDaySuccess);
     yield TrackLoading();
+
     try {
       // Old Track Day Data
-      final currentTrackDay = (state as TrackLoadDaySuccess);
-      var mealsTrack = currentTrackDay.meals;
+      var dayToTrack = trackDays.firstWhere(
+          (d) =>
+              DateFormat.yMMMd().format(d.date) ==
+              DateFormat.yMMMd().format(day.trackDay.date),
+          orElse: () => null);
+      if (dayToTrack == null) {
+        trackDays.add(day.trackDay);
+        dayToTrack = day.trackDay;
+      }
+
+      print(trackDays);
+
+      final mealsTrack = dayToTrack.meals;
 
       //New Meal data
       final newGroup = event.newGroupName;
@@ -67,15 +81,18 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
 
       //Replacement
       if (oldGroup == null) {
-        if (mealsTrack.keys.toList().contains(newGroup))
-          mealsTrack[newGroup].add(newMeal);
-        else
+        if (mealsTrack.keys.toList().contains(newGroup)) {
+          final indexMeal =
+              mealsTrack[newGroup].indexWhere((m) => m.id == newMeal.id);
+          indexMeal != null
+              ? mealsTrack[newGroup][indexMeal] = newMeal
+              : mealsTrack[newGroup].add(newMeal);
+        } else
           mealsTrack[newGroup] = [newMeal];
       } else if (newGroup == oldGroup) {
-        mealsTrack[newGroup].map((e) {
-          if (e.id == newMeal.id) e = newMeal;
-          return e;
-        }).toList();
+        final indexMeal =
+            mealsTrack[newGroup].indexWhere((m) => m.id == newMeal.id);
+        if (indexMeal != null) mealsTrack[newGroup][indexMeal] = newMeal;
       } else {
         mealsTrack[oldGroup].removeWhere((m) => m.id == newMeal.id);
 
@@ -98,12 +115,15 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
       }
 
       //Yielding results
-      yield TrackLoadDaySuccess(
-          date: currentTrackDay.date,
-          macroTarget: currentTrackDay.macroTarget,
+      final trackDay = Track(
+          date: dayToTrack.date,
+          macrosConsumed: dayToTrack.macrosConsumed,
           meals: mealsTrack);
+
+      yield TrackLoadDaySuccess(trackDay);
     } catch (e) {
-      TrackLoadedFailure(e.message);
+      print(e);
+      TrackLoadedFailure('WENT GRONG');
     }
   }
 
@@ -114,22 +134,17 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
   }
 
   Stream<TrackState> _mapTrackDayToState(TrackLoadDay event) async* {
-    var formatedDate = DateFormat('yyyy-MM-dd').format(event.date);
-
-    var macroDay = trakDays.firstWhere(
-        (day) => DateFormat('yyyy-MM-dd').format(day.date) == formatedDate,
+    yield TrackLoading();
+    final formatedDate = DateFormat.yMMMd().format(event.date);
+    final macroDay = trackDays.firstWhere(
+        (day) => DateFormat.yMMMd().format(day.date) == formatedDate,
         orElse: () =>
-            Track(date: event.date, goals: Macro(0, 0, 0), mealGroup: {}));
-    // print(mealBloc.state);
-
+            Track(date: event.date, macrosConsumed: Macro(0, 0, 0), meals: {}));
     try {
-      final formatedMeals = macroDay
-          .trackMealsToItemMeals((mealBloc.state as MealLoadSuccess).myMeals);
+      // final userMeals = [...(mealBloc.state as MealLoadSuccess).myMeals];
+      //macroDay.trackMealsToItemMeals(userMeals);
 
-      yield TrackLoadDaySuccess(
-          date: formatedDate,
-          macroTarget: macroDay.goals,
-          meals: formatedMeals);
+      yield TrackLoadDaySuccess(macroDay);
     } catch (e) {
       print(e);
     }

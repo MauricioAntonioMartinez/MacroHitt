@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:HIIT/screens/index.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -28,6 +27,20 @@ class MealBloc extends Bloc<MealEvent, MealState> {
       yield* _addMeal(event);
     } else if (event is MealEdit) {
       yield* _editMeal(event);
+    } else if (event is MealDelete) {
+      yield* _deleteMeal(event);
+    }
+  }
+
+  Stream<MealState> _deleteMeal(MealDelete event) async* {
+    final meals = (state as MealLoadSuccess).myMeals;
+    yield MealLoading();
+    try {
+      final mealId = event.id;
+      meals.removeWhere((meal) => meal.id == mealId);
+      yield MealLoadSuccess(meals);
+    } catch (e) {
+      MealLoadFailure('CANNOT DELELETE');
     }
   }
 
@@ -91,10 +104,11 @@ class MealBloc extends Bloc<MealEvent, MealState> {
       final database = await db();
       await database.update('mealitem', updatedMeal.toMap(),
           where: 'id=?', whereArgs: [updatedMeal.id]);
+
       final indexUpdatedMeal =
           prevMeals.indexWhere((m) => m.id == updatedMeal.id);
       prevMeals[indexUpdatedMeal] = updatedMeal;
-      print(indexUpdatedMeal);
+
       yield MealLoadSuccess(prevMeals);
     } catch (e) {
       MealLoadFailure('CANNOT UPDATE MEAL');

@@ -25,47 +25,56 @@ class _SearchState extends State<Search> {
             meal.mealName.toLowerCase().contains(matchingName.toLowerCase()))
         .toList();
 
-    return Scaffold(
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
-          backgroundColor: Colors.white,
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.cancel,
-              ),
-              onPressed: () {
-                _controller.clear();
-              },
-            )
-          ],
-          title: TextFormField(
-            controller: _controller,
-            autofocus: true,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.all(8),
-              hintText: 'eggs ...',
-            ),
-            onChanged: (value) {
-              setState(() {
-                matchingName = value;
-              });
-            },
-            style: Theme.of(context).textTheme.caption,
-          ),
-        ),
-        body: meals.length > 0
-            ? ListView.builder(
-                itemBuilder: (context, i) => MealItemWidget(meals[i], false),
-                itemCount: meals.length,
-              )
-            : Center(
-                child: SvgPicture.asset(
-                  'assets/vectors/404.svg',
-                  width: 300,
+    return BlocListener<MealBloc, MealState>(
+        listener: (context, state) {
+          if (state is MealLoadSuccess) {
+            setState(() {
+              meals = state.myMeals;
+            });
+          }
+        },
+        child: Scaffold(
+            appBar: AppBar(
+              iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+              backgroundColor: Colors.white,
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(
+                    Icons.cancel,
+                  ),
+                  onPressed: () {
+                    _controller.clear();
+                  },
+                )
+              ],
+              title: TextFormField(
+                controller: _controller,
+                autofocus: true,
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.all(8),
+                  hintText: 'eggs ...',
                 ),
-              ));
+                onChanged: (value) {
+                  setState(() {
+                    matchingName = value;
+                  });
+                },
+                style: Theme.of(context).textTheme.caption,
+              ),
+            ),
+            body: meals.length > 0
+                ? ListView.builder(
+                    itemBuilder: (context, i) =>
+                        MealItemWidget(meals[i], false),
+                    itemCount: meals.length,
+                  )
+                : Center(
+                    child: SvgPicture.asset(
+                      'assets/vectors/404.svg',
+                      width: 300,
+                    ),
+                  )));
   }
 }

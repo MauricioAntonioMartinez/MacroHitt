@@ -21,6 +21,7 @@ class TrackAddMeal extends TrackEvent {
 
 class TrackEditMeal extends TrackEvent {
   final MealItem meal;
+
   final MealGroupName newGroupName;
   final MealGroupName oldGroupName;
   const TrackEditMeal(this.meal, this.newGroupName, this.oldGroupName);
