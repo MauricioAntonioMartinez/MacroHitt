@@ -9,7 +9,6 @@ abstract class TrackState extends Equatable {
 
 class TrackMealTrackGroupLoadedSuccess extends TrackState {
   final List<MealItem> mealBloc;
-  // final Track currentTrack;
   const TrackMealTrackGroupLoadedSuccess({this.mealBloc});
   @override
   List<Object> get props => [mealBloc];
@@ -17,9 +16,6 @@ class TrackMealTrackGroupLoadedSuccess extends TrackState {
 
 class TrackLoadDaySuccess extends TrackState {
   final Track trackDay;
-  // final String date;
-  // final Map<MealGroupName, List<MealItem>> meals;
-  // final Macro macroTarget;
   TrackLoadDaySuccess(this.trackDay);
 }
 

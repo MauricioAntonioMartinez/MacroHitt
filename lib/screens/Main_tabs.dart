@@ -29,6 +29,7 @@ class _MainScreenState extends State<MainScreen>
     super.initState();
     Future.delayed(Duration.zero).then((value) =>
         BlocProvider.of<TrackBloc>(context).add(TrackLoadDay(DateTime.now())));
+
     _routes = [
       {'title': 'Search'},
       {},
@@ -80,7 +81,6 @@ class _MainScreenState extends State<MainScreen>
                 currentWidget = Tracking(
                   macrosConsumed: state.trackDay.macrosConsumed,
                   meals: state.trackDay.meals,
-                  goals: Macro(20, 20, 20),
                 );
               }
               return CarouselSlider(

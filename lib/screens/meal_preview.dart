@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:HIIT/Widgets/meal_view/qty_input.dart';
 import 'package:flutter/material.dart';
 import '../Widgets/meal_view/macros_slim.dart';
@@ -19,44 +21,48 @@ class _MealPreviewState extends State<MealPreview> {
   final newQtyController = TextEditingController();
   MealGroupName groupName;
   MealItem meal;
+  var isDeleted = false;
   var isTrack = false;
   Map mealSelected;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    mealSelected = ModalRoute.of(context).settings.arguments;
-    List<MealItem> meals;
-    if (mealSelected['groupName'] == null) {
-      meals =
-          (BlocProvider.of<MealBloc>(context).state as MealLoadSuccess).myMeals;
-      groupName = MealGroupName.BreakFast;
-    } else {
-      isTrack = true;
-      meals = (BlocProvider.of<TrackBloc>(context).state as TrackLoadDaySuccess)
-          .trackDay
-          .meals[mealSelected['groupName']];
-      groupName = mealSelected['groupName'];
-    }
-    if (meals != null) {
-      final mealFetched = meals.firstWhere(
-          (e) => e.id == mealSelected['mealId'],
-          orElse: () => null);
-      if (mealFetched != null)
-        meal = MealItem(
-            brandName: mealFetched.brandName,
-            servingSize: mealFetched.servingSize,
-            carbs: mealFetched.carbs,
-            protein: mealFetched.protein,
-            fats: mealFetched.fats,
-            mealName: mealFetched.mealName,
-            servingName: mealFetched.servingName,
-            fiber: mealFetched.fiber,
-            id: mealFetched.id,
-            monosaturatedFat: mealFetched.monosaturatedFat,
-            polyunsaturatedFat: mealFetched.polyunsaturatedFat,
-            saturatedFat: mealFetched.saturatedFat,
-            sugar: mealFetched.sugar);
+    if (!isDeleted) {
+      mealSelected = ModalRoute.of(context).settings.arguments;
+      List<MealItem> meals;
+      if (mealSelected['groupName'] == null) {
+        meals = (BlocProvider.of<MealBloc>(context).state as MealLoadSuccess)
+            .myMeals;
+        groupName = MealGroupName.BreakFast;
+      } else {
+        isTrack = true;
+        meals =
+            (BlocProvider.of<TrackBloc>(context).state as TrackLoadDaySuccess)
+                .trackDay
+                .meals[mealSelected['groupName']];
+        groupName = mealSelected['groupName'];
+      }
+      if (meals != null) {
+        final mealFetched = meals.firstWhere(
+            (e) => e.id == mealSelected['mealId'],
+            orElse: () => null);
+        if (mealFetched != null)
+          meal = MealItem(
+              brandName: mealFetched.brandName,
+              servingSize: mealFetched.servingSize,
+              carbs: mealFetched.carbs,
+              protein: mealFetched.protein,
+              fats: mealFetched.fats,
+              mealName: mealFetched.mealName,
+              servingName: mealFetched.servingName,
+              fiber: mealFetched.fiber,
+              id: mealFetched.id,
+              monosaturatedFat: mealFetched.monosaturatedFat,
+              polyunsaturatedFat: mealFetched.polyunsaturatedFat,
+              saturatedFat: mealFetched.saturatedFat,
+              sugar: mealFetched.sugar);
+      }
     }
   }
 
@@ -250,7 +256,6 @@ class _MealPreviewState extends State<MealPreview> {
                                                   ],
                                                 )).then((isDeleted) {
                                           if (isDeleted) {
-                                            Navigator.of(context).pop();
                                             isTrack
                                                 ? BlocProvider.of<TrackBloc>(
                                                         context)
@@ -259,6 +264,8 @@ class _MealPreviewState extends State<MealPreview> {
                                                 : BlocProvider.of<MealBloc>(
                                                         context)
                                                     .add(MealDelete(meal.id));
+                                            Navigator.of(context)
+                                                .pushReplacementNamed('/');
                                           }
                                         });
                                       }
@@ -370,7 +377,7 @@ class _MealPreviewState extends State<MealPreview> {
             ),
       bottomNavigationBar: BottomButton(() {
         BlocProvider.of<TrackBloc>(context)
-            .add(TrackEditMeal(meal, groupName, mealSelected['groupName']));
+            .add(TrackAddMeal(meal, groupName, mealSelected['groupName']));
         Navigator.of(context).pop();
       }),
     );

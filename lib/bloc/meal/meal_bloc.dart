@@ -37,6 +37,12 @@ class MealBloc extends Bloc<MealEvent, MealState> {
     yield MealLoading();
     try {
       final mealId = event.id;
+      final database = await db();
+      await database.delete(
+        'mealitem',
+        where: "id = ?",
+        whereArgs: [mealId],
+      );
       meals.removeWhere((meal) => meal.id == mealId);
       yield MealLoadSuccess(meals);
     } catch (e) {

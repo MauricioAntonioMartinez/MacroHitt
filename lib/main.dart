@@ -28,6 +28,9 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<TrackBloc>(
           create: (_) =>
               TrackBloc(mealBloc: BlocProvider.of<MealBloc>(context)),
+        ),
+        BlocProvider<ConfigurationBloc>(
+          create: (_) => ConfigurationBloc(),
         )
       ],
       child: MaterialApp(

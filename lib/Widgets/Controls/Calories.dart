@@ -1,40 +1,56 @@
+import 'package:HIIT/Widgets/UI/Skeleton.dart';
+import 'package:HIIT/bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../bloc/Model/model.dart';
 
 class Calorie extends StatelessWidget {
   final bool isInverse;
-
-  Calorie(this.isInverse);
+  final Macro macrosConsumed;
+  Calorie(this.isInverse, this.macrosConsumed);
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (ctx, cons) => Container(
-        margin:
-            EdgeInsets.symmetric(vertical: 0, horizontal: cons.maxWidth * 0.05),
-        padding: EdgeInsets.only(top: 5),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Stack(
+    return BlocBuilder<ConfigurationBloc, ConfigurationState>(
+        builder: (context, state) {
+      if (state is ConfigurationSuccess) {
+        final goals = state.defaultMacros;
+        final consumedPercentage =
+            macrosConsumed.getCalories / goals.getCalories;
+        return LayoutBuilder(
+          builder: (ctx, cons) => Container(
+            margin: EdgeInsets.symmetric(
+                vertical: 0, horizontal: cons.maxWidth * 0.05),
+            padding: EdgeInsets.only(top: 5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                Container(
-                  width: double.infinity,
-                  color: Colors.red,
-                  height: 1,
+                Stack(
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      color: Theme.of(context).primaryColorLight,
+                      height: 1,
+                    ),
+                    Container(
+                      width: cons.maxWidth * consumedPercentage,
+                      color: Theme.of(context).primaryColorDark,
+                      height: 1,
+                    )
+                  ],
                 ),
-                Container(
-                  width: double.infinity,
-                  color: Colors.green,
-                  height: 0.5,
-                )
+                Text(isInverse
+                    ? 'Calories Consumed: ${(macrosConsumed.getCalories).toStringAsFixed(2)}'
+                    : 'Calories Remaining: ${(goals.getCalories - macrosConsumed.getCalories).toStringAsFixed(2)}')
               ],
             ),
-            Text(isInverse
-                ? 'Calories Consumed: 00.00'
-                : 'Calories Remaining: 00.00')
-          ],
-        ),
-      ),
-    );
+          ),
+        );
+      }
+      return Skeleton(
+        height: 20,
+        width: double.infinity,
+      );
+    });
   }
 }

@@ -7,7 +7,7 @@ class Track extends Macro {
   Map<MealGroupName, List<MealTrack>> mealsTrack = {};
   final DateTime date;
   Macro macrosConsumed;
-  Track({this.meals, this.date, this.macrosConsumed})
+  Track(this.mealsTrack, {this.meals, this.date, this.macrosConsumed})
       : super(
             macrosConsumed.protein, macrosConsumed.carbs, macrosConsumed.fats);
 
@@ -62,6 +62,15 @@ class Track extends Macro {
   double get getFats {
     return this.meals.values.toList().fold(0,
         (acc, meal) => acc + 1.1); //meal.fold(0, (acc, meal) => meal.getFats));
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'date': date,
+      'protein': macrosConsumed.protein,
+      'carbs': macrosConsumed.carbs,
+      'fats': macrosConsumed.fats,
+    };
   }
 }
 

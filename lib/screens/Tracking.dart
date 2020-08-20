@@ -8,8 +8,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 class Tracking extends StatelessWidget {
   final Map<MealGroupName, List<MealItem>> meals;
   final Macro macrosConsumed;
-  final Macro goals;
-  Tracking({this.macrosConsumed, this.meals, this.goals});
+
+  Tracking({this.macrosConsumed, this.meals});
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +28,8 @@ class Tracking extends StatelessWidget {
               enlargeCenterPage: false,
             ),
             items: [
-              Macros(
-                  goals: goals,
-                  macrosConsumed: macrosConsumed,
-                  isInverse: true),
-              Macros(
-                  goals: goals,
-                  macrosConsumed: macrosConsumed,
-                  isInverse: false),
+              Macros(macrosConsumed: macrosConsumed, isInverse: true),
+              Macros(macrosConsumed: macrosConsumed, isInverse: false),
             ],
           ),
           isTrackDayEmpty

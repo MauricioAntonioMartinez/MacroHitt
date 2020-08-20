@@ -6,7 +6,13 @@ abstract class ConfigurationState extends Equatable {
   List<Object> get props => [];
 }
 
-class ConfigurationInitial extends ConfigurationState {}
+class ConfigurationSuccess extends ConfigurationState {
+  final Macro defaultMacros;
+  ConfigurationSuccess(this.defaultMacros);
+
+  @override
+  List<Object> get props => [defaultMacros];
+}
 
 class ConfigurationLoading extends ConfigurationState {}
 
