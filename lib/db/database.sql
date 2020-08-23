@@ -31,6 +31,20 @@ CREATE TABLE meal_group
     groupName TEXT
 );
 
+INSERT INTO meal_group
+    (id,groupName)
+VALUES('1', 'BreakFast');
+
+INSERT INTO meal_group
+    (id,groupName)
+VALUES('2', 'Lunch');
+INSERT INTO meal_group
+    (id,groupName)
+VALUES('3', 'Snack');
+INSERT INTO meal_group
+    (id,groupName)
+VALUES('4', 'Dinner');
+
 
 CREATE TABLE track_meal
 (

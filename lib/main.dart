@@ -4,12 +4,14 @@ import './screens/index.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import './bloc/bloc.dart';
 import './BlocObserver.dart';
+import 'bloc/Repositories/index.dart';
 
 void main() {
   Bloc.observer = SimpleBlocObserver();
   runApp(BlocProvider(
       create: (context) {
-        return MealBloc()..add(MealLoad());
+        return MealBloc(mealItemRepository: MealItemRepository())
+          ..add(MealLoad());
       },
       child: MyApp()));
 }
@@ -26,8 +28,10 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         BlocProvider<TrackBloc>(
-          create: (_) =>
-              TrackBloc(mealBloc: BlocProvider.of<MealBloc>(context)),
+          create: (_) => TrackBloc(
+              mealBloc: BlocProvider.of<MealBloc>(context),
+              trackRepository: TrackRepository(),
+              trackItemRepository: TrackItemRepository()),
         ),
         BlocProvider<ConfigurationBloc>(
           create: (_) => ConfigurationBloc(),

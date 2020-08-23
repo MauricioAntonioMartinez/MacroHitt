@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
-
-import '../../db/db.dart';
+import '../Repositories/index.dart';
 import '../Model/model.dart';
 
 part 'meal_event.dart';
@@ -15,7 +13,8 @@ part 'meal_state.dart';
 var uuid = Uuid();
 
 class MealBloc extends Bloc<MealEvent, MealState> {
-  MealBloc() : super(MealLoading());
+  final MealItemRepository mealItemRepository;
+  MealBloc({this.mealItemRepository}) : super(MealLoading());
 
   @override
   Stream<MealState> mapEventToState(
@@ -37,12 +36,7 @@ class MealBloc extends Bloc<MealEvent, MealState> {
     yield MealLoading();
     try {
       final mealId = event.id;
-      final database = await db();
-      await database.delete(
-        'mealitem',
-        where: "id = ?",
-        whereArgs: [mealId],
-      );
+      await mealItemRepository.deleteItem(mealId);
       meals.removeWhere((meal) => meal.id == mealId);
       yield MealLoadSuccess(meals);
     } catch (e) {
@@ -53,30 +47,11 @@ class MealBloc extends Bloc<MealEvent, MealState> {
   Stream<MealState> _mapMealTrackGroupLoadedToState() async* {
     yield MealLoading();
     try {
-      final database = await db();
-      final List<Map<String, dynamic>> fetchMeals =
-          await database.query('mealitem');
-      List<MealItem> mealsFetched = [];
-      fetchMeals.forEach((i) {
-        mealsFetched.add(MealItem(
-            id: i['id'],
-            brandName: i['brandName'],
-            mealName: i['mealName'],
-            servingName: i['servingName'],
-            servingSize: i['servingSize'],
-            carbs: i['carbs'],
-            fats: i['fats'],
-            protein: i['protein'],
-            monosaturatedFat: i['monosaturatedFat'],
-            polyunsaturatedFat: i['polyunsaturatedFat'],
-            saturatedFat: i['saturatedFat'],
-            sugar: i['sugar'],
-            fiber: i['fiber']));
-      });
-      yield MealLoadSuccess(mealsFetched);
+      final meals = await mealItemRepository.findItems();
+      yield MealLoadSuccess(meals);
     } catch (_) {
       print(_);
-      yield MealLoadFailure('CANNOT LOAD YOUR MEALS');
+      yield MealLoadFailure('CANNOT LOAD YOUR MEALS FAGGOT');
     }
   }
 
@@ -84,16 +59,8 @@ class MealBloc extends Bloc<MealEvent, MealState> {
     final oldMeals = (state as MealLoadSuccess).myMeals;
     yield MealLoading();
     try {
-      final id = uuid.v4();
-      final newMeal = event.mealItem;
-      newMeal.setId(id);
-      final database = await db();
-      await database.insert(
-        'mealitem',
-        {'id': id, ...newMeal.toMap()},
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-      oldMeals.add(event.mealItem);
+      final meal = await mealItemRepository.addItem(event.mealItem);
+      oldMeals.add(meal);
       yield MealLoadSuccess(oldMeals);
     } catch (_) {
       print(_);
@@ -106,11 +73,7 @@ class MealBloc extends Bloc<MealEvent, MealState> {
     yield MealLoading();
     try {
       final updatedMeal = event.mealItem;
-      print(updatedMeal);
-      final database = await db();
-      await database.update('mealitem', updatedMeal.toMap(),
-          where: 'id=?', whereArgs: [updatedMeal.id]);
-
+      await mealItemRepository.updateItem(updatedMeal);
       final indexUpdatedMeal =
           prevMeals.indexWhere((m) => m.id == updatedMeal.id);
       prevMeals[indexUpdatedMeal] = updatedMeal;

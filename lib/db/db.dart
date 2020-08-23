@@ -8,10 +8,12 @@ Future<String> getPaht() async =>
 Future<Database> db() async {
   return openDatabase(
     await getPaht(),
-    onOpen: (db) {
-      // db.rawQuery('SELECT * FROM track;').then((value) {
-      //   print(value);
-      // });
+    onOpen: (db) async {
+      //  final m = await db.rawQuery('DELETE FROM track_meal;');
+      //print(m);
+      // db.rawQuery('DELETE FROM track_meal');
+      // db.rawQuery('DELETE FROM track');
+      print('OPEN DATABASE');
     },
     onCreate: (db, version) {
       return db;
@@ -19,6 +21,15 @@ Future<Database> db() async {
     onUpgrade: (db, oldVerson, newVersion) {
       print('UPDATE');
     },
-    version: 15,
+    version: 22,
   );
 }
+
+//  db.insert('meal_group', {'id': '1', 'groupName': 'BreakFast'},
+//           conflictAlgorithm: ConflictAlgorithm.replace);
+//       db.insert('meal_group', {'id': '2', 'groupName': 'Lunch'},
+//           conflictAlgorithm: ConflictAlgorithm.replace);
+//       db.insert('meal_group', {'id': '3', 'groupName': 'Dinner'},
+//           conflictAlgorithm: ConflictAlgorithm.replace);
+//       db.insert('meal_group', {'id': '4', 'groupName': 'Snack'},
+//           conflictAlgorithm: ConflictAlgorithm.replace);

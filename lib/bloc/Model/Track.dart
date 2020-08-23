@@ -3,18 +3,20 @@ import './model.dart';
 enum MealGroupName { BreakFast, Lunch, Dinner, Snack }
 
 class Track extends Macro {
+  final String id;
   Map<MealGroupName, List<MealItem>> meals = {};
   Map<MealGroupName, List<MealTrack>> mealsTrack = {};
   final DateTime date;
   Macro macrosConsumed;
-  Track(this.mealsTrack, {this.meals, this.date, this.macrosConsumed})
+  Track({this.id, this.meals, this.date, this.macrosConsumed})
       : super(
             macrosConsumed.protein, macrosConsumed.carbs, macrosConsumed.fats);
 
-  Map<MealGroupName, List<MealItem>> trackMealsToItemMeals(
-      List<MealItem> userMeals) {
+  static Map<MealGroupName, List<MealItem>> trackMealsToItemMeals(
+      List<MealItem> userMeals,
+      Map<MealGroupName, List<MealTrack>> mealsTrack) {
     Map<MealGroupName, List<MealItem>> finalMeals = {};
-    this.mealsTrack.forEach((key, trackMeals) {
+    mealsTrack.forEach((key, trackMeals) {
       finalMeals[key] = trackMeals.map((mealTrack) {
         final mealItem = userMeals.firstWhere((m) => m.id == mealTrack.id);
         final qty = mealTrack.qty;
@@ -34,7 +36,7 @@ class Track extends Macro {
             fiber: mealItem.fiber);
       }).toList();
     });
-    this.meals = finalMeals;
+
     return finalMeals;
   }
 
@@ -78,4 +80,22 @@ class MealTrack {
   final String id;
   final double qty;
   MealTrack({this.id, this.qty});
+}
+
+class MealTrackItem {
+  final String id;
+  final String mealId;
+  final String trackId;
+  final String groupId;
+  final double qty;
+
+  MealTrackItem(this.id, this.mealId, this.trackId, this.groupId, this.qty);
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'meal_id': mealId,
+        'track_id': trackId,
+        'group_id': groupId,
+        'qty': qty
+      };
 }
