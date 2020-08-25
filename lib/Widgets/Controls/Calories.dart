@@ -11,10 +11,9 @@ class Calorie extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ConfigurationBloc, ConfigurationState>(
-        builder: (context, state) {
-      if (state is ConfigurationSuccess) {
-        final goals = state.defaultMacros;
+    return BlocBuilder<GoalBloc, GoalState>(builder: (context, state) {
+      if (state is GoalSuccess) {
+        final goals = state.goals[0];
         final consumedPercentage =
             macrosConsumed.getCalories / goals.getCalories;
         return LayoutBuilder(

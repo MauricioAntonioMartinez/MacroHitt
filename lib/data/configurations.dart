@@ -1,3 +1,8 @@
 import '../bloc/Model/model.dart';
 
-final Macro goalsConfigration = Macro(160, 160, 60);
+final List<Macro> goalsConfigration = [
+  Macro(160, 160, 60),
+  Macro(160, 160, 60),
+  Macro(160, 160, 60),
+  Macro(160, 160, 60),
+];

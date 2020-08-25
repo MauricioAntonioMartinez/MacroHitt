@@ -9,9 +9,9 @@ Future<Database> db() async {
   return openDatabase(
     await getPaht(),
     onOpen: (db) async {
-      //  final m = await db.rawQuery('DELETE FROM track_meal;');
-      //print(m);
-      // db.rawQuery('DELETE FROM track_meal');
+      //  db.rawQuery('ALTER TABLE goal ADD COLUMN isActive BOOLEAN');
+      print(await db.query('goal'));
+      //db.rawQuery('DELETE FROM goal');
       // db.rawQuery('DELETE FROM track');
       print('OPEN DATABASE');
     },

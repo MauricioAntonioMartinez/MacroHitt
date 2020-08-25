@@ -70,6 +70,7 @@ CREATE TABLE track_meal
 CREATE TABLE goal
 (
     id TEXT PRIMARY KEY,
+    isActive BOOLEAN ,
     goalName TEXT NOT NULL,
     protein REAL,
     carbs REAL,

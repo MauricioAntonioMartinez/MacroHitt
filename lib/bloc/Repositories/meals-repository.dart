@@ -16,6 +16,7 @@ class MealItemRepository implements CRUD<MealItem> {
       {'id': id, ...newMeal.toMap()},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+
     return newMeal;
   }
 
@@ -26,6 +27,8 @@ class MealItemRepository implements CRUD<MealItem> {
       where: "id = ?",
       whereArgs: [mealId],
     );
+    await database
+        .delete('track_meal', where: "meal_id=?", whereArgs: [mealId]);
   }
 
   Future<MealItem> updateItem(MealItem mealItem) async {

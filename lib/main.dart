@@ -1,3 +1,4 @@
+import 'package:HIIT/bloc/Repositories/goals-repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import './screens/index.dart';
@@ -33,8 +34,8 @@ class _MyAppState extends State<MyApp> {
               trackRepository: TrackRepository(),
               trackItemRepository: TrackItemRepository()),
         ),
-        BlocProvider<ConfigurationBloc>(
-          create: (_) => ConfigurationBloc(),
+        BlocProvider<GoalBloc>(
+          create: (_) => GoalBloc(goalsRepository: GoalItemRepository()),
         )
       ],
       child: MaterialApp(
@@ -69,6 +70,7 @@ class _MyAppState extends State<MyApp> {
           Search.routeName: (ctx) => Search(),
           MealPreview.routeName: (ctx) => MealPreview(),
           EditMeal.routeName: (ctx) => EditMeal(),
+          AddGoalWidget.routName: (ctx) => AddGoalWidget(),
         },
         onGenerateRoute: (settings) {
           print(settings);

@@ -1,8 +1,9 @@
-import 'package:HIIT/bloc/Model/Macro.dart';
-
+import 'package:HIIT/bloc/Model/GoalItem.dart';
+import 'package:HIIT/screens/Add_goal.dart';
+import '../bloc/Model/model.dart';
+import './Configuration.dart';
 import '../Widgets/Main_Drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import './Tracking.dart';
 import './Add_Meal.dart';
 import 'package:intl/intl.dart';
@@ -10,8 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import './search.dart';
-
-//import 'package:flutter_radial_menu/flutter_radial_menu.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -21,9 +21,10 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   List<Map<String, Object>> _routes;
-  int _currentIndex = 1;
+  int _currentIndex = 0;
   String currentDate = DateFormat.yMMMd().format(DateTime.now());
   final CarouselController _controller = CarouselController();
+  GlobalKey _bottomNavigationKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -31,7 +32,7 @@ class _MainScreenState extends State<MainScreen>
         BlocProvider.of<TrackBloc>(context).add(TrackLoadDay(DateTime.now())));
 
     _routes = [
-      {'title': 'Search'},
+      {'title': 'Pick your goal'},
       {},
       {'title': 'Add Your Meal'},
     ];
@@ -42,6 +43,19 @@ class _MainScreenState extends State<MainScreen>
     final double maxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+        actions: <Widget>[
+          if (_currentIndex == 0)
+            IconButton(
+                icon: Icon(Icons.add_circle),
+                color: Colors.white,
+                iconSize: 40,
+                enableFeedback: true,
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AddGoalWidget.routName,
+                      arguments:
+                          GoalItem(id: '', goalName: '', goal: Macro(0, 0, 0)));
+                })
+        ],
         title: GestureDetector(
             onTap: () {
               if (_currentIndex == 1)
@@ -100,7 +114,7 @@ class _MainScreenState extends State<MainScreen>
                   enableInfiniteScroll: false,
                   enlargeCenterPage: false,
                 ),
-                items: [AddMeal({}), currentWidget, AddMeal({})],
+                items: [Goal(), currentWidget, AddMeal({})],
               );
             },
           );
@@ -126,8 +140,9 @@ class _MainScreenState extends State<MainScreen>
       bottomNavigationBar: SizedBox(
         height: 56,
         child: CurvedNavigationBar(
+          key: _bottomNavigationKey,
           backgroundColor: Theme.of(context).primaryColor,
-          initialIndex: 1,
+          initialIndex: _currentIndex,
           items: <Widget>[
             Icon(
               Icons.settings,
@@ -140,6 +155,9 @@ class _MainScreenState extends State<MainScreen>
             ),
           ],
           onTap: (index) {
+            // final _CurvedNavigationBarState navBarState =
+            //     _bottomNavigationKey.currentState;
+
             _controller.animateToPage(index,
                 duration: Duration(seconds: 1), curve: Curves.easeInOutQuad);
             setState(() {
