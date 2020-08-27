@@ -23,7 +23,10 @@ class Goal extends StatelessWidget {
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
                           colors: goals[index].isActive != null
-                              ? [Theme.of(context).primaryColor, Colors.white]
+                              ? [
+                                  Theme.of(context).primaryColorLight,
+                                  Colors.white
+                                ]
                               : [Colors.white38, Colors.white],
                           tileMode: TileMode.clamp)),
                   child: ListTile(
@@ -33,9 +36,12 @@ class Goal extends StatelessWidget {
                     subtitle: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-                        Text('${goals[index].protein}g '),
-                        Text('${goals[index].carbs}g '),
-                        Text('${goals[index].fats}g '),
+                        Text('${goals[index].protein}g ',
+                            style: TextStyle(color: Colors.green)),
+                        Text('${goals[index].carbs}g ',
+                            style: TextStyle(color: Colors.blue)),
+                        Text('${goals[index].fats}g ',
+                            style: TextStyle(color: Colors.red)),
                       ],
                     ),
                     trailing: IconButton(

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import '../screens/search.dart';
 
-class MainDrawer extends StatefulWidget {
-  @override
-  _MainDrawerState createState() => _MainDrawerState();
-}
-
-class _MainDrawerState extends State<MainDrawer> {
-  List<Map<String, Object>> _navegationItems = [
-    {'nav': 'Add Meal'},
-    {'nav': 'Search Meal'},
-    {'nav': 'Tracking'}
+class MainDrawer extends StatelessWidget {
+  final Function navAction;
+  final List<Map<String, Object>> _navegationItems = [
+    {'nav': 'Add Meal', 'index': 2},
+    {'nav': 'Tracking', 'index': 1},
+    {'nav': 'Add Goal', 'index': 0},
+    {'nav': 'Search Meal', 'routeName': Search.routeName},
   ];
+  MainDrawer(this.navAction);
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +45,22 @@ class _MainDrawerState extends State<MainDrawer> {
                         child: Column(
                           children: <Widget>[
                             ListTile(
+                                onTap: () {
+                                  if (e['index'] != null) {
+                                    navAction(e['index']);
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    Navigator.of(context)
+                                        .pushNamed(e['routeName'])
+                                        .then((value) {
+                                      Navigator.of(context).pop();
+                                    });
+                                  }
+                                },
                                 title: Text(
-                              e['nav'],
-                              style: Theme.of(context).textTheme.subhead,
-                            )),
+                                  e['nav'],
+                                  style: Theme.of(context).textTheme.subhead,
+                                )),
                             Divider()
                           ],
                         ),

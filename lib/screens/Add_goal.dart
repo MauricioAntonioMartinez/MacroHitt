@@ -35,6 +35,7 @@ class _AddGoalWidgetState extends State<AddGoalWidget> {
         'protein': goal.protein,
         'carbs': goal.carbs,
         'fats': goal.fats,
+        'isActive': goal.isActive
       };
       _goalInfo = createGoal(goalInfo);
     }
@@ -49,6 +50,7 @@ class _AddGoalWidgetState extends State<AddGoalWidget> {
       final carbs = convertDouble(goalInfo['carbs']);
       final fats = convertDouble(goalInfo['fats']);
       final goal = GoalItem(
+          isActive: goalInfo['isActive'],
           goal: Macro(protein, carbs, fats),
           goalName: goalInfo['goalName'],
           id: goalInfo['id']);
@@ -125,44 +127,52 @@ class _AddGoalWidgetState extends State<AddGoalWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add your goal'),
+        title: Text(_isEditMode ? 'Change your preferences' : 'Add a goal'),
         actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                          title: Text('Do you really delete this goal?',
-                              style: Theme.of(context).textTheme.subtitle),
-                          actions: <Widget>[
-                            BlocListener<TrackBloc, TrackState>(
-                              listener: (context, state) {},
-                              child: FlatButton(
-                                child: Text('Yes'),
-                                onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                              ),
-                            ),
-                            FlatButton(
-                              child: Text('No',
-                                  style: TextStyle(color: Colors.red)),
-                              onPressed: () {
-                                Navigator.of(context).pop(false);
-                              },
-                            )
-                          ],
-                        )).then((isDeleted) {
-                  if (isDeleted) {
-                    setState(() {
-                      _isDeleted = true;
+          BlocBuilder<GoalBloc, GoalState>(
+            builder: (context, state) {
+              if (state is GoalSuccess && state.goals.length > 1) {
+                return IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: Text('Do you really delete this goal?',
+                                    style:
+                                        Theme.of(context).textTheme.subtitle),
+                                actions: <Widget>[
+                                  BlocListener<TrackBloc, TrackState>(
+                                    listener: (context, state) {},
+                                    child: FlatButton(
+                                      child: Text('Yes'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                    ),
+                                  ),
+                                  FlatButton(
+                                    child: Text('No',
+                                        style: TextStyle(color: Colors.red)),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false);
+                                    },
+                                  )
+                                ],
+                              )).then((isDeleted) {
+                        if (isDeleted) {
+                          setState(() {
+                            _isDeleted = true;
+                          });
+                          BlocProvider.of<GoalBloc>(context)
+                              .add(DeleteGoal(goalInfo['id']));
+                        }
+                      });
                     });
-                    BlocProvider.of<GoalBloc>(context)
-                        .add(DeleteGoal(goalInfo['id']));
-                  }
-                });
-              })
+              }
+              return Text('');
+            },
+          )
         ],
       ),
       body: SingleChildScrollView(
@@ -189,7 +199,7 @@ class _AddGoalWidgetState extends State<AddGoalWidget> {
               }
             },
             builder: (context, state) {
-              if (state is GoalSuccess) {
+              if (state is GoalSuccess || state is GoalFailure) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -224,11 +234,6 @@ class _AddGoalWidgetState extends State<AddGoalWidget> {
                 );
               }
 
-              if (state is GoalFailure) {
-                return Center(
-                  child: Text('Something went wrong'),
-                );
-              }
               return Center(
                 child: CircularProgressIndicator(),
               );

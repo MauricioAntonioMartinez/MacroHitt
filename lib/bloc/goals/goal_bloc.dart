@@ -37,16 +37,18 @@ class GoalBloc extends Bloc<GoalEvent, GoalState> {
     yield GoalLoading();
     try {
       final nextActiveGoalId = event.nextActiveGoalId;
-      await goalsRepository.setActiveGoal(activeGoal.id, nextActiveGoalId);
       final newGoalIndex = goals.indexWhere(
         (goal) => goal.id == nextActiveGoalId,
       );
       final prevGoalIndex = goals.indexWhere(
         (goal) => goal.id == activeGoal.id,
       );
+      if (newGoalIndex != prevGoalIndex) {
+        await goalsRepository.setActiveGoal(activeGoal.id, nextActiveGoalId);
 
-      goals[newGoalIndex].isActive = 1;
-      goals[prevGoalIndex].isActive = null;
+        goals[newGoalIndex].isActive = 1;
+        goals[prevGoalIndex].isActive = null;
+      }
 
       yield GoalSuccess(goals, goals[newGoalIndex]);
     } catch (e) {
@@ -82,16 +84,17 @@ class GoalBloc extends Bloc<GoalEvent, GoalState> {
 
   Stream<GoalState> _editGoal(EditGoal event) async* {
     final goals = (state as GoalSuccess).goals;
-    final activeGoal = (state as GoalSuccess).activeGoal;
+    var activeGoal = (state as GoalSuccess).activeGoal;
     yield GoalLoading();
     try {
       final editedGoal = event.goal;
       await goalsRepository.updateItem(editedGoal);
       final indexGoal = goals.indexWhere((gl) => gl.id == editedGoal.id);
+      if (goals[indexGoal].id == activeGoal.id) activeGoal = editedGoal;
       goals[indexGoal] = editedGoal;
       yield GoalSuccess(goals, activeGoal);
     } catch (e) {
-      yield GoalFailure(message: 'CANNOT LOAD GoalS', statusCode: 404);
+      yield GoalFailure(message: 'CANNOT LOAD GOALS', statusCode: 404);
     }
   }
 
@@ -101,9 +104,14 @@ class GoalBloc extends Bloc<GoalEvent, GoalState> {
     yield GoalLoading();
     try {
       final goalId = event.goalId;
-      await goalsRepository.deleteItem(goalId);
-      goals.removeWhere((gl) => gl.id == goalId);
-      yield GoalSuccess(goals, activeGoal);
+      if (goals.length - 1 == 0) {
+        yield GoalFailure();
+        yield GoalSuccess(goals, activeGoal);
+      } else {
+        await goalsRepository.deleteItem(goalId);
+        goals.removeWhere((gl) => gl.id == goalId);
+        yield GoalSuccess(goals, activeGoal);
+      }
     } catch (e) {
       yield GoalFailure(message: 'CANNOT LOAD GoalS', statusCode: 404);
     }

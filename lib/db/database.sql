@@ -14,16 +14,16 @@ CREATE TABLE mealitem
     saturatedFat REAL,
     monosaturatedFat REAL,
     polyunsaturatedFat REAL
-)
+);
 
 CREATE TABLE track
 (
     id TEXT PRIMARY KEY,
     protein REAL,
     carbs REAL,
-    carbs REAL,
+    fats REAL,
     date TEXT
-)
+);
 
 CREATE TABLE meal_group
 (
@@ -34,7 +34,6 @@ CREATE TABLE meal_group
 INSERT INTO meal_group
     (id,groupName)
 VALUES('1', 'BreakFast');
-
 INSERT INTO meal_group
     (id,groupName)
 VALUES('2', 'Lunch');
@@ -64,7 +63,7 @@ CREATE TABLE track_meal
 (meal_id)
        REFERENCES mealitem
 (id)
-)
+);
 
 
 CREATE TABLE goal
@@ -75,7 +74,11 @@ CREATE TABLE goal
     protein REAL,
     carbs REAL,
     fats REAL
-)
+);
+
+INSERT INTO goal
+    (id,isActive,goalName,protein,carbs,fats)
+VALUES('1', 1, 'MyGoal', 180, 250, 60);
 
 
 CREATE TABLE recipie
@@ -85,7 +88,7 @@ CREATE TABLE recipie
     protein REAL,
     carbs REAL,
     fats REAL
-)
+);
 
 
 CREATE TABLE recipie_meal

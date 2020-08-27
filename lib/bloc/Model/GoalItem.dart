@@ -4,7 +4,7 @@ class GoalItem extends Macro {
   String id;
   final String goalName;
   final Macro goal;
-  var isActive = null;
+  var isActive;
 
   set setId(String newId) {
     id = newId;
@@ -16,6 +16,7 @@ class GoalItem extends Macro {
         'goalName': goalName,
         'protein': goal.protein,
         'carbs': goal.carbs,
-        'fats': goal.fats
+        'fats': goal.fats,
+        'isActive': isActive
       };
 }

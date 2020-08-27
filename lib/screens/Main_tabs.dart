@@ -21,7 +21,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   List<Map<String, Object>> _routes;
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   String currentDate = DateFormat.yMMMd().format(DateTime.now());
   final CarouselController _controller = CarouselController();
   GlobalKey _bottomNavigationKey = GlobalKey();
@@ -77,7 +77,12 @@ class _MainScreenState extends State<MainScreen>
                 ? currentDate
                 : _routes[_currentIndex]['title'])),
       ),
-      drawer: MainDrawer(),
+      drawer: MainDrawer((index) {
+        setState(() {
+          _controller.jumpToPage(index);
+          _currentIndex = index;
+        });
+      }),
       body: BlocBuilder<MealBloc, MealState>(
         builder: (context, state) {
           if (state is MealLoadSuccess) {
@@ -137,34 +142,37 @@ class _MainScreenState extends State<MainScreen>
               ),
             )
           : Text(''),
-      bottomNavigationBar: SizedBox(
-        height: 56,
-        child: CurvedNavigationBar(
-          key: _bottomNavigationKey,
-          backgroundColor: Theme.of(context).primaryColor,
-          initialIndex: _currentIndex,
-          items: <Widget>[
-            Icon(
-              Icons.settings,
-              size: 30,
-            ),
-            Icon(Icons.calendar_today, size: 30),
-            Icon(
-              Icons.add,
-              size: 30,
-            ),
-          ],
-          onTap: (index) {
-            // final _CurvedNavigationBarState navBarState =
-            //     _bottomNavigationKey.currentState;
-
-            _controller.animateToPage(index,
-                duration: Duration(seconds: 1), curve: Curves.easeInOutQuad);
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-        ),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+            height: 15,
+            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+          ),
+          CurvedNavigationBar(
+            key: _bottomNavigationKey,
+            backgroundColor: Theme.of(context).primaryColor,
+            index: _currentIndex,
+            items: <Widget>[
+              Icon(
+                Icons.settings,
+                size: 30,
+              ),
+              Icon(Icons.calendar_today, size: 30),
+              Icon(
+                Icons.add,
+                size: 30,
+              ),
+            ],
+            onTap: (index) {
+              _controller.animateToPage(index,
+                  duration: Duration(seconds: 1), curve: Curves.easeInOutQuad);
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          )
+        ],
       ),
     );
   }
