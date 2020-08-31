@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/search.dart';
+import '../screens/Add_Recipie.dart';
 
 class MainDrawer extends StatelessWidget {
   final Function navAction;
@@ -8,6 +9,7 @@ class MainDrawer extends StatelessWidget {
     {'nav': 'Tracking', 'index': 1},
     {'nav': 'Add Goal', 'index': 0},
     {'nav': 'Search Meal', 'routeName': Search.routeName},
+    {'nav': 'Add Recipie', 'routeName': AddRecipieWidget.routeName},
   ];
   MainDrawer(this.navAction);
 

@@ -71,6 +71,7 @@ class _MyAppState extends State<MyApp> {
           MealPreview.routeName: (ctx) => MealPreview(),
           EditMeal.routeName: (ctx) => EditMeal(),
           AddGoalWidget.routName: (ctx) => AddGoalWidget(),
+          AddRecipieWidget.routeName: (ctx) => AddRecipieWidget()
         },
         onGenerateRoute: (settings) {
           print(settings);

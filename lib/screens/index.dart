@@ -6,3 +6,4 @@ export './Tracking.dart';
 export './search.dart';
 export './meal_preview.dart';
 export './Add_goal.dart';
+export './Add_Recipie.dart';
