@@ -9,7 +9,9 @@ class MealItemWidget extends StatelessWidget {
   final MealItem mealItem;
   final MealGroupName groupName;
   final bool isDismissible;
-  MealItemWidget(this.mealItem, this.isDismissible, [this.groupName]);
+  final bool isRecipie;
+  MealItemWidget(this.mealItem, this.isDismissible,
+      [this.groupName, this.isRecipie]);
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +65,10 @@ class MealItemWidget extends StatelessWidget {
                           )).then((isDeleted) => isDeleted);
                 },
                 onDismissed: (_) {
-                  BlocProvider.of<TrackBloc>(context)
-                      .add(TrackRemoveMeal(mealItem.id, groupName));
+                  if (isRecipie == null) {
+                    BlocProvider.of<TrackBloc>(context)
+                        .add(TrackRemoveMeal(mealItem.id, groupName));
+                  } else {}
                 },
                 dismissThresholds: dismissThresholds,
                 background: Container(
