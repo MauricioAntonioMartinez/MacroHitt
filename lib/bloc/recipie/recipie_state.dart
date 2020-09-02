@@ -12,11 +12,10 @@ class RecipieInitial extends RecipieState {}
 class RecipieLoading extends RecipieState {}
 
 class RecipieLoadSuccess extends RecipieState {
-  final List<MealItem> recipieMeals;
-  final String recipieId;
-  RecipieLoadSuccess(this.recipieMeals, this.recipieId);
+  final Recipie recipie;
+  RecipieLoadSuccess(this.recipie);
   @override
-  List<Object> get props => [recipieMeals];
+  List<Object> get props => [recipie];
 }
 
 class RecipieLoadFailure extends RecipieState {

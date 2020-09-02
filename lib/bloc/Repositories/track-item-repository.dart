@@ -9,7 +9,7 @@ class TrackItemRepository implements CRUD<MealTrackItem> {
   Future<MealTrackItem> addItem(MealTrackItem trackItem) async {
     final database = await db();
     await database.insert(
-      'track_meal',
+      'recipie_meal',
       trackItem.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -19,7 +19,7 @@ class TrackItemRepository implements CRUD<MealTrackItem> {
   Future<void> deleteItem(String mealId, [MealTrackItem meal]) async {
     final database = await db();
     database.delete(
-      'track_meal',
+      'recipie_meal',
       whereArgs: [mealId, meal.groupId, meal.trackId],
       where: 'meal_id=? AND group_id=? AND track_id=?',
     );
@@ -29,7 +29,7 @@ class TrackItemRepository implements CRUD<MealTrackItem> {
       [String oldGrpId]) async {
     final database = await db();
     await database.update(
-      'track_meal',
+      'recipie_meal',
       trackItem.toJson(),
       whereArgs: [trackItem.mealId, oldGrpId, trackItem.trackId],
       where: 'meal_id=? AND group_id=? AND track_id=?',
@@ -42,6 +42,6 @@ class TrackItemRepository implements CRUD<MealTrackItem> {
 
   Future<MealTrackItem> findItem(String id) async {
     final database = await db();
-    database.query('track_meal', where: 'mealId=? ');
+    database.query('recipie_meal', where: 'mealId=? ');
   }
 }

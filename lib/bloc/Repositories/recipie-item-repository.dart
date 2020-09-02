@@ -4,44 +4,45 @@ import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 import '../Model/Crud.dart';
 
-class RecipieItemRepository implements CRUD<MealTrackItem> {
+class RecipieItemRepository implements CRUD<RecipieItem> {
   final uuid = Uuid();
-  Future<MealTrackItem> addItem(MealTrackItem trackItem) async {
+  Future<RecipieItem> addItem(RecipieItem recipieItem) async {
     final database = await db();
     await database.insert(
       'recipie_meal',
-      trackItem.toJson(),
+      recipieItem.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    return trackItem;
+    return recipieItem;
   }
 
-  Future<void> deleteItem(String mealId, [MealTrackItem meal]) async {
+  Future<void> deleteItem(String mealId, [RecipieItem meal]) async {
     final database = await db();
     database.delete(
       'recipie_meal',
-      whereArgs: [mealId, meal.groupId, meal.trackId],
-      where: 'meal_id=? AND group_id=? AND track_id=?',
+      whereArgs: [mealId, meal.recipieId],
+      where: 'meal_id=?  AND recipie_id=?',
     );
   }
 
-  Future<MealTrackItem> updateItem(MealTrackItem trackItem,
-      [String oldGrpId]) async {
+  Future<RecipieItem> updateItem(
+    RecipieItem recipieItem,
+  ) async {
     final database = await db();
     await database.update(
       'recipie_meal',
-      trackItem.toJson(),
-      whereArgs: [trackItem.mealId, oldGrpId, trackItem.trackId],
-      where: 'meal_id=? AND group_id=? AND track_id=?',
+      recipieItem.toJson(),
+      whereArgs: [recipieItem.mealId, recipieItem.recipieId],
+      where: 'meal_id=? AND recipie_id=?',
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    return trackItem;
+    return recipieItem;
   }
 
-  Future<List<MealTrackItem>> findItems() async {}
+  Future<List<RecipieItem>> findItems() async {}
 
-  Future<MealTrackItem> findItem(String id) async {
+  Future<RecipieItem> findItem(String id) async {
     final database = await db();
-    database.query('recipie_meal', where: 'mealId=? ');
+    database.query('recipie_meal', where: 'meal_id=? ');
   }
 }

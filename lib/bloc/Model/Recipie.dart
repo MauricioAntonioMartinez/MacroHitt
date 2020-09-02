@@ -3,41 +3,38 @@ import './Macro.dart';
 
 class Recipie extends Macro {
   final String id;
-  final String recipieId;
+  final String recipeMeal;
   List<MealItem> meals = [];
   List<RecipieItem> recipieMeals = [];
   Macro macrosConsumed;
 
-  Recipie({this.id, this.meals, this.recipieId, this.macrosConsumed})
+  Recipie({this.id, this.meals, this.recipeMeal, this.macrosConsumed})
       : super(
             macrosConsumed.protein, macrosConsumed.carbs, macrosConsumed.fats);
 
-  static Map<MealGroupName, List<MealItem>> recipieMealsToItemMeals(
-      List<MealItem> userMeals,
-      Map<MealGroupName, List<RecipieItem>> recipieMeals) {
-    Map<MealGroupName, List<MealItem>> finalMeals = {};
-    recipieMeals.forEach((key, trackMeals) {
-      finalMeals[key] = trackMeals.map((mealTrack) {
-        final mealItem = userMeals.firstWhere((m) => m.id == mealTrack.id);
-        final qty = mealTrack.qty;
-        return MealItem(
-            id: mealItem.id,
-            carbs: (mealItem.carbs * qty),
-            protein: mealItem.protein * qty,
-            fats: mealItem.fats * qty,
-            brandName: mealItem.brandName,
-            mealName: mealItem.mealName,
-            servingName: mealItem.servingName,
-            servingSize: mealItem.servingSize * qty,
-            monosaturatedFat: mealItem.monosaturatedFat,
-            polyunsaturatedFat: mealItem.polyunsaturatedFat,
-            saturatedFat: mealItem.saturatedFat,
-            sugar: mealItem.sugar,
-            fiber: mealItem.fiber);
-      }).toList();
+  static List<MealItem> recipieMealsToItemMeals(
+      List<MealItem> userMeals, List<RecipieItem> recipieMeals) {
+    List<MealItem> myMeals = [];
+    recipieMeals.forEach((meal) {
+      final mealItem = userMeals.firstWhere((m) => m.id == meal.mealId);
+      final qty = meal.qty;
+      return myMeals.add(MealItem(
+          id: mealItem.id,
+          carbs: (mealItem.carbs * qty),
+          protein: mealItem.protein * qty,
+          fats: mealItem.fats * qty,
+          brandName: mealItem.brandName,
+          mealName: mealItem.mealName,
+          servingName: mealItem.servingName,
+          servingSize: mealItem.servingSize * qty,
+          monosaturatedFat: mealItem.monosaturatedFat,
+          polyunsaturatedFat: mealItem.polyunsaturatedFat,
+          saturatedFat: mealItem.saturatedFat,
+          sugar: mealItem.sugar,
+          fiber: mealItem.fiber));
     });
 
-    return finalMeals;
+    return myMeals;
   }
 
   double get getTotalCalories {
@@ -68,7 +65,8 @@ class Recipie extends Macro {
 
   Map<String, dynamic> toMap() {
     return {
-      'recipieId': recipieId,
+      'id': id,
+      'recipieMeal': recipeMeal,
       'protein': macrosConsumed.protein,
       'carbs': macrosConsumed.carbs,
       'fats': macrosConsumed.fats,

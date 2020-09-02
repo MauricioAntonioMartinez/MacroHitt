@@ -12,7 +12,8 @@ Future<Database> db() async {
       //  db.rawQuery('ALTER TABLE goal ADD COLUMN isActive BOOLEAN');
       //print(await db.query('goal'));
       //db.rawQuery('DELETE FROM goal');
-      print(await db.query('meal_group'));
+      print(await db.query('recipie', where: "id=?", whereArgs: ['2']));
+      //print(await db.query('meal_group'));
       // db.rawQuery('DELETE FROM track');
 
 //       db.execute('''
