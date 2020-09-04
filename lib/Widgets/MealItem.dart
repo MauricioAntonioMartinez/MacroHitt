@@ -1,17 +1,17 @@
 import 'package:HIIT/bloc/bloc.dart';
+import 'package:HIIT/bloc/recipie/recipie_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../bloc/Model/model.dart';
-import '../screens/meal_preview.dart';
 import '../bloc/bloc.dart';
+import '../screens/meal_preview.dart';
 
 class MealItemWidget extends StatelessWidget {
   final MealItem mealItem;
   final MealGroupName groupName;
   final bool isDismissible;
-  final bool isRecipie;
-  MealItemWidget(this.mealItem, this.isDismissible,
-      [this.groupName, this.isRecipie]);
+  MealItemWidget(this.mealItem, this.isDismissible, [this.groupName]);
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +21,17 @@ class MealItemWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed(MealPreview.routeName, arguments: {
-          "mealId": mealItem.id,
+        var arguments = {
+          "meal": mealItem,
           "groupName": groupName,
-          "isfromTrack": isDismissible
-        });
+        };
+        // print(groupName);
+        // final isFromRecipie = groupName == null;
+        // if (isFromRecipie) {
+        //   arguments = {"isFromRecipie": true, "mealId": mealItem.id};
+        // }
+        Navigator.of(context)
+            .pushNamed(MealPreview.routeName, arguments: arguments);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -65,10 +71,13 @@ class MealItemWidget extends StatelessWidget {
                           )).then((isDeleted) => isDeleted);
                 },
                 onDismissed: (_) {
-                  if (isRecipie == null) {
+                  if (groupName != null) {
                     BlocProvider.of<TrackBloc>(context)
                         .add(TrackRemoveMeal(mealItem.id, groupName));
-                  } else {}
+                  } else {
+                    BlocProvider.of<RecipieBloc>(context)
+                        .add(DeleteMealRecipie(mealItem.id));
+                  }
                 },
                 dismissThresholds: dismissThresholds,
                 background: Container(

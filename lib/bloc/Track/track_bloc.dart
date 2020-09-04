@@ -1,11 +1,14 @@
 import 'dart:async';
+
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:uuid/uuid.dart';
+
 import '../../util/track.dart';
 import '../Model/model.dart';
-import '../meal/meal_bloc.dart';
-import 'package:bloc/bloc.dart';
-import 'package:uuid/uuid.dart';
-import 'package:equatable/equatable.dart';
 import '../Repositories/index.dart';
+import '../meal/meal_bloc.dart';
+
 part 'track_event.dart';
 part 'track_state.dart';
 
@@ -88,6 +91,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
 
     try {
       final newMeal = event.meal;
+      newMeal.setOrigin = MealOrigin.Track;
       final currentTrack = day.trackDay;
       final isNewTrack = currentTrack.id == '';
       Track dayToTrack;

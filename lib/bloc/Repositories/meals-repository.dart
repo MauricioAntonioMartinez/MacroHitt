@@ -1,8 +1,9 @@
-import '../Model/model.dart';
-import '../../db/db.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../db/db.dart';
 import '../Model/Crud.dart';
+import '../Model/model.dart';
 
 class MealItemRepository implements CRUD<MealItem> {
   final uuid = Uuid();
@@ -46,6 +47,7 @@ class MealItemRepository implements CRUD<MealItem> {
     fetchMeals.forEach((i) {
       mealsFetched.add(MealItem(
           id: i['id'],
+          origin: MealOrigin.Search,
           brandName: i['brandName'],
           mealName: i['mealName'],
           servingName: i['servingName'],
@@ -64,6 +66,7 @@ class MealItemRepository implements CRUD<MealItem> {
 
   Future<MealItem> findItem(String id) async {
     return MealItem(
+        origin: MealOrigin.Search,
         mealName: null,
         protein: null,
         carbs: null,

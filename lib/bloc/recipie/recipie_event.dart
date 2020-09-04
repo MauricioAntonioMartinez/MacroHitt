@@ -12,17 +12,14 @@ class LoadRecipieMeals extends RecipieEvent {
   LoadRecipieMeals(this.recipieId);
 }
 
-class AddMeal extends RecipieEvent {
+class AddEditMealRecipie extends RecipieEvent {
   final MealItem meal;
-  AddMeal(this.meal);
+  AddEditMealRecipie(this.meal);
 }
 
-class UpdateMeal extends RecipieEvent {
-  final MealItem meal;
-  UpdateMeal(this.meal);
-}
-
-class DeleteMeal extends RecipieEvent {
+class DeleteMealRecipie extends RecipieEvent {
   final String mealId;
-  DeleteMeal(this.mealId);
+  DeleteMealRecipie(this.mealId);
 }
+
+class SaveRecipie extends RecipieEvent {}

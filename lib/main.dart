@@ -1,10 +1,13 @@
 import 'package:HIIT/bloc/Repositories/goals-repository.dart';
+import 'package:HIIT/bloc/Repositories/recipie-item-repository.dart';
+import 'package:HIIT/bloc/Repositories/recipie-repository.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import './screens/index.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import './bloc/bloc.dart';
+import 'package:provider/provider.dart';
+
 import './BlocObserver.dart';
+import './bloc/bloc.dart';
+import './screens/index.dart';
 import 'bloc/Repositories/index.dart';
 
 void main() {
@@ -36,6 +39,12 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider<GoalBloc>(
           create: (_) => GoalBloc(goalsRepository: GoalItemRepository()),
+        ),
+        BlocProvider<RecipieBloc>(
+          create: (_) => RecipieBloc(
+              mealBloc: BlocProvider.of(context),
+              recipieItemRepository: RecipieItemRepository(),
+              recipieRepository: RecipieRepository()),
         )
       ],
       child: MaterialApp(

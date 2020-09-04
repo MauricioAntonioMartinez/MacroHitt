@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:sqflite/sqflite.dart';
+
+import '../../db/db.dart';
 import '../Model/Crud.dart';
 import '../Model/Recipie.dart';
-import '../../db/db.dart';
 import '../Model/model.dart';
-import 'dart:async';
 
 class RecipieRepository implements CRUD<Recipie> {
   Future<Recipie> addItem(Recipie recipie, [String id]) async {
@@ -52,7 +54,7 @@ class RecipieRepository implements CRUD<Recipie> {
   Future<Recipie> findItem(String recipieId, [List<MealItem> userMeals]) async {
     final database = await db();
     final List<Map<String, dynamic>> recipie =
-        await database.query('recipie', where: "id=", whereArgs: [recipieId]);
+        await database.query('recipie', where: "id=?", whereArgs: [recipieId]);
 
     if (recipie.length < 1)
       return Recipie(

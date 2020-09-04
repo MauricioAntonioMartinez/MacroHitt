@@ -22,6 +22,7 @@ class Track extends Macro {
         final qty = mealTrack.qty;
         return MealItem(
             id: mealItem.id,
+            origin: MealOrigin.Track,
             carbs: (mealItem.carbs * qty),
             protein: mealItem.protein * qty,
             fats: mealItem.fats * qty,

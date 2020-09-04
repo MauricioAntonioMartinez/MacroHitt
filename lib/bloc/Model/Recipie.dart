@@ -1,4 +1,5 @@
 import 'package:HIIT/bloc/Model/model.dart';
+
 import './Macro.dart';
 
 class Recipie extends Macro {
@@ -20,6 +21,7 @@ class Recipie extends Macro {
       final qty = meal.qty;
       return myMeals.add(MealItem(
           id: mealItem.id,
+          origin: MealOrigin.Recipie,
           carbs: (mealItem.carbs * qty),
           protein: mealItem.protein * qty,
           fats: mealItem.fats * qty,

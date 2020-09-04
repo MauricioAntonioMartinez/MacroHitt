@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../bloc/Model/model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/Model/model.dart';
 import '../bloc/bloc.dart';
 import '../inputs/create-meal.dart';
 
@@ -41,6 +42,7 @@ class _AddMealState extends State<AddMeal> {
       final servingSize = convertDouble(newMeal['servingSize']);
       final thisMeal = MealItem(
         id: newMeal['id'],
+        origin: newMeal['origin'],
         mealName: newMeal['mealName'],
         brandName: newMeal['brandName'],
         servingName: newMeal['servingName'],

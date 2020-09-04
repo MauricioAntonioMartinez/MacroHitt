@@ -1,4 +1,8 @@
+import 'package:flutter/cupertino.dart';
+
 import './model.dart';
+
+enum MealOrigin { Track, Search, Recipie }
 
 class MealItem extends Macro {
   String id;
@@ -14,6 +18,7 @@ class MealItem extends Macro {
   final double monosaturatedFat;
   final double polyunsaturatedFat;
   final double saturatedFat;
+  MealOrigin origin;
 
   MealItem(
       {this.id,
@@ -24,6 +29,7 @@ class MealItem extends Macro {
       @required this.brandName,
       @required this.servingName,
       @required this.servingSize,
+      @required this.origin,
       this.fiber = 0,
       this.sugar = 0,
       this.polyunsaturatedFat = 0,
@@ -38,6 +44,10 @@ class MealItem extends Macro {
     this.protein = (this.protein / oldServingSize) * newQty;
     this.fats = (this.fats / oldServingSize) * newQty;
     return this;
+  }
+
+  set setOrigin(MealOrigin origin) {
+    this.origin = origin;
   }
 
   Map<String, dynamic> toMap() {

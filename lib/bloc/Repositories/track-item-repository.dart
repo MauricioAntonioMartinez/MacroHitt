@@ -1,15 +1,16 @@
-import '../Model/model.dart';
-import '../../db/db.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../db/db.dart';
 import '../Model/Crud.dart';
+import '../Model/model.dart';
 
 class TrackItemRepository implements CRUD<MealTrackItem> {
   final uuid = Uuid();
   Future<MealTrackItem> addItem(MealTrackItem trackItem) async {
     final database = await db();
     await database.insert(
-      'recipie_meal',
+      'track_meal',
       trackItem.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -19,7 +20,7 @@ class TrackItemRepository implements CRUD<MealTrackItem> {
   Future<void> deleteItem(String mealId, [MealTrackItem meal]) async {
     final database = await db();
     database.delete(
-      'recipie_meal',
+      'track_meal',
       whereArgs: [mealId, meal.groupId, meal.trackId],
       where: 'meal_id=? AND group_id=? AND track_id=?',
     );
@@ -29,7 +30,7 @@ class TrackItemRepository implements CRUD<MealTrackItem> {
       [String oldGrpId]) async {
     final database = await db();
     await database.update(
-      'recipie_meal',
+      'track_meal',
       trackItem.toJson(),
       whereArgs: [trackItem.mealId, oldGrpId, trackItem.trackId],
       where: 'meal_id=? AND group_id=? AND track_id=?',
@@ -42,6 +43,6 @@ class TrackItemRepository implements CRUD<MealTrackItem> {
 
   Future<MealTrackItem> findItem(String id) async {
     final database = await db();
-    database.query('recipie_meal', where: 'mealId=? ');
+    database.query('track_meal', where: 'mealId=? ');
   }
 }

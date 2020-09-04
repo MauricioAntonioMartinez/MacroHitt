@@ -1,14 +1,13 @@
-import 'dart:isolate';
-
 import 'package:HIIT/Widgets/meal_view/qty_input.dart';
 import 'package:flutter/material.dart';
-import '../Widgets/meal_view/macros_slim.dart';
-import '../bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/Model/model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../Widgets/UI/BottomButton.dart';
+
 import './EditMeal.dart';
+import '../Widgets/UI/BottomButton.dart';
+import '../Widgets/meal_view/macros_slim.dart';
+import '../bloc/Model/model.dart';
+import '../bloc/bloc.dart';
 
 class MealPreview extends StatefulWidget {
   static const routeName = '/meal-preview';
@@ -30,25 +29,50 @@ class _MealPreviewState extends State<MealPreview> {
     super.didChangeDependencies();
     if (!isDeleted) {
       mealSelected = ModalRoute.of(context).settings.arguments;
+      meal = mealSelected['meal'];
+      print(meal.origin);
+      //print(mealSelected);
       List<MealItem> meals;
-      if (mealSelected['groupName'] == null) {
-        meals = (BlocProvider.of<MealBloc>(context).state as MealLoadSuccess)
-            .myMeals;
-        groupName = MealGroupName.BreakFast;
-      } else {
-        isTrack = true;
-        meals =
-            (BlocProvider.of<TrackBloc>(context).state as TrackLoadDaySuccess)
-                .trackDay
-                .meals[mealSelected['groupName']];
-        groupName = mealSelected['groupName'];
+      switch (meal.origin) {
+        case MealOrigin.Search:
+          meals = (BlocProvider.of<MealBloc>(context).state as MealLoadSuccess)
+              .myMeals;
+          groupName = MealGroupName.BreakFast;
+          break;
+        case MealOrigin.Recipie:
+          meals = (BlocProvider.of<RecipieBloc>(context).state
+                  as RecipieLoadSuccess)
+              .recipie
+              .meals;
+          break;
+        case MealOrigin.Track:
+          isTrack = true;
+          meals =
+              (BlocProvider.of<TrackBloc>(context).state as TrackLoadDaySuccess)
+                  .trackDay
+                  .meals[mealSelected['groupName']];
+          groupName = mealSelected['groupName'];
+          break;
       }
+
+      // if (mealSelected['groupName'] == null) {
+      //   meals = (BlocProvider.of<MealBloc>(context).state as MealLoadSuccess)
+      //       .myMeals;
+      //   groupName = MealGroupName.BreakFast;
+      // } else {
+      //   isTrack = true;
+      //   meals =
+      //       (BlocProvider.of<TrackBloc>(context).state as TrackLoadDaySuccess)
+      //           .trackDay
+      //           .meals[mealSelected['groupName']];
+      //   groupName = mealSelected['groupName'];
+      // }
       if (meals != null) {
-        final mealFetched = meals.firstWhere(
-            (e) => e.id == mealSelected['mealId'],
-            orElse: () => null);
+        final mealFetched =
+            meals.firstWhere((e) => e.id == meal.id, orElse: () => null);
         if (mealFetched != null)
           meal = MealItem(
+              origin: mealFetched.origin,
               brandName: mealFetched.brandName,
               servingSize: mealFetched.servingSize,
               carbs: mealFetched.carbs,
@@ -175,30 +199,32 @@ class _MealPreviewState extends State<MealPreview> {
                       height: 30,
                       child: Row(
                         children: <Widget>[
-                          Expanded(
-                              child: GestureDetector(
-                            onTap: () {
-                              bottomModalSheet(
-                                  MealGroupName.values,
-                                  (e) => setState(() {
-                                        groupName = e;
-                                      }),
-                                  '.');
-                            },
-                            child: Row(
-                              children: <Widget>[
-                                Text(
-                                    groupName
-                                        .toString()
-                                        .split('MealGroupName.')[1],
-                                    style: TextStyle(
-                                        fontFamily: 'Questrial',
-                                        fontSize: 18,
-                                        color: Theme.of(context).primaryColor)),
-                                Icon(Icons.expand_more)
-                              ],
-                            ),
-                          )),
+                          if (mealSelected['isFromRecipie'] != true)
+                            Expanded(
+                                child: GestureDetector(
+                              onTap: () {
+                                bottomModalSheet(
+                                    MealGroupName.values,
+                                    (e) => setState(() {
+                                          groupName = e;
+                                        }),
+                                    '.');
+                              },
+                              child: Row(
+                                children: <Widget>[
+                                  Text(
+                                      groupName
+                                          .toString()
+                                          .split('MealGroupName.')[1],
+                                      style: TextStyle(
+                                          fontFamily: 'Questrial',
+                                          fontSize: 18,
+                                          color:
+                                              Theme.of(context).primaryColor)),
+                                  Icon(Icons.expand_more)
+                                ],
+                              ),
+                            )),
                           Row(
                             children: <Widget>[
                               IconButton(
@@ -274,7 +300,9 @@ class _MealPreviewState extends State<MealPreview> {
                             ],
                           )
                         ],
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: mealSelected['isFromRecipie'] != null
+                            ? MainAxisAlignment.end
+                            : MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.start,
                       ),
                     ),
@@ -376,8 +404,30 @@ class _MealPreviewState extends State<MealPreview> {
               ),
             ),
       bottomNavigationBar: BottomButton(() {
-        BlocProvider.of<TrackBloc>(context)
-            .add(TrackAddMeal(meal, groupName, mealSelected['groupName']));
+        switch (meal.origin) {
+          case MealOrigin.Recipie: // already in the recipie
+            BlocProvider.of<RecipieBloc>(context).add(AddEditMealRecipie(meal));
+            break;
+          case MealOrigin.Track: // already in the recipie
+            BlocProvider.of<TrackBloc>(context)
+                .add(TrackAddMeal(meal, groupName, mealSelected['groupName']));
+            break;
+          case MealOrigin.Search: //is new decide where to add recipie or track
+            if (groupName == null)
+              BlocProvider.of<RecipieBloc>(context)
+                  .add(AddEditMealRecipie(meal));
+            else
+              BlocProvider.of<TrackBloc>(context).add(
+                  TrackAddMeal(meal, groupName, mealSelected['groupName']));
+            break;
+        }
+
+        // if (mealSelected['isFromRecipie'] != true) {
+        //   BlocProvider.of<TrackBloc>(context)
+        //       .add(TrackAddMeal(meal, groupName, mealSelected['groupName']));
+        // } else {
+        //   BlocProvider.of<RecipieBloc>(context).add(AddEditMealRecipie(meal));
+        // }
         Navigator.of(context).pop();
       }),
     );
