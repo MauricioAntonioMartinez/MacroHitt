@@ -38,8 +38,9 @@ class MealWidget extends StatelessWidget {
               ],
             )),
       Column(
-          children:
-              mealGrup.map((i) => MealItemWidget(i, true, groupName)).toList())
+          children: mealGrup
+              .map((i) => MealItemWidget(i, true, MealOrigin.Track, groupName))
+              .toList())
     ]));
   }
 }

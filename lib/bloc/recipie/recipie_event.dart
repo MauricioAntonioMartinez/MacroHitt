@@ -23,3 +23,8 @@ class DeleteMealRecipie extends RecipieEvent {
 }
 
 class SaveRecipie extends RecipieEvent {}
+
+class DeleteRecipie extends RecipieEvent {
+  final String recipieId;
+  DeleteRecipie(this.recipieId);
+}

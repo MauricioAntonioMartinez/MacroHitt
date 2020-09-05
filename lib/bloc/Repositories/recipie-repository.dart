@@ -31,6 +31,8 @@ class RecipieRepository implements CRUD<Recipie> {
 
   Future<void> deleteItem(String recipieId) async {
     final database = await db();
+    await database
+        .delete('recipie_meal', where: 'recipie_id=?', whereArgs: [recipieId]);
     await database.delete('recipie', where: 'id=?', whereArgs: [recipieId]);
   }
 

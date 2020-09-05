@@ -21,6 +21,7 @@ class _MealPreviewState extends State<MealPreview> {
   MealGroupName groupName;
   MealItem meal;
   var isDeleted = false;
+  MealOrigin origin;
   var isTrack = false;
   Map mealSelected;
 
@@ -30,8 +31,7 @@ class _MealPreviewState extends State<MealPreview> {
     if (!isDeleted) {
       mealSelected = ModalRoute.of(context).settings.arguments;
       meal = mealSelected['meal'];
-      print(meal.origin);
-      //print(mealSelected);
+      origin = mealSelected['origin'];
       List<MealItem> meals;
       switch (meal.origin) {
         case MealOrigin.Search:
@@ -199,7 +199,7 @@ class _MealPreviewState extends State<MealPreview> {
                       height: 30,
                       child: Row(
                         children: <Widget>[
-                          if (mealSelected['isFromRecipie'] != true)
+                          if (origin != MealOrigin.Recipie)
                             Expanded(
                                 child: GestureDetector(
                               onTap: () {
@@ -300,9 +300,9 @@ class _MealPreviewState extends State<MealPreview> {
                             ],
                           )
                         ],
-                        mainAxisAlignment: mealSelected['isFromRecipie'] != null
-                            ? MainAxisAlignment.end
-                            : MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: origin != MealOrigin.Recipie
+                            ? MainAxisAlignment.spaceEvenly
+                            : MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.start,
                       ),
                     ),
@@ -404,30 +404,17 @@ class _MealPreviewState extends State<MealPreview> {
               ),
             ),
       bottomNavigationBar: BottomButton(() {
-        switch (meal.origin) {
-          case MealOrigin.Recipie: // already in the recipie
+        switch (origin) {
+          case MealOrigin.Recipie:
             BlocProvider.of<RecipieBloc>(context).add(AddEditMealRecipie(meal));
             break;
-          case MealOrigin.Track: // already in the recipie
+          case MealOrigin.Track:
             BlocProvider.of<TrackBloc>(context)
                 .add(TrackAddMeal(meal, groupName, mealSelected['groupName']));
             break;
-          case MealOrigin.Search: //is new decide where to add recipie or track
-            if (groupName == null)
-              BlocProvider.of<RecipieBloc>(context)
-                  .add(AddEditMealRecipie(meal));
-            else
-              BlocProvider.of<TrackBloc>(context).add(
-                  TrackAddMeal(meal, groupName, mealSelected['groupName']));
+          default:
             break;
         }
-
-        // if (mealSelected['isFromRecipie'] != true) {
-        //   BlocProvider.of<TrackBloc>(context)
-        //       .add(TrackAddMeal(meal, groupName, mealSelected['groupName']));
-        // } else {
-        //   BlocProvider.of<RecipieBloc>(context).add(AddEditMealRecipie(meal));
-        // }
         Navigator.of(context).pop();
       }),
     );

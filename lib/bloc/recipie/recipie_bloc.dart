@@ -37,12 +37,30 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
       yield* _addEditMeal(event);
     } else if (event is DeleteMealRecipie) {
       yield* _deleteMealRecipie(event);
+    } else if (event is SaveRecipie) {
+      yield* _saveRecipie();
+    } else if (event is DeleteRecipie) {
+      yield* _deleteRecipie();
+    }
+  }
+
+  Stream<RecipieState> _deleteRecipie() async* {
+    yield RecipieLoading();
+    final recipie = (state as RecipieLoadSuccess).recipie;
+    try {
+      await recipieRepository.deleteItem(recipie.id);
+      yield RecipieDeleteSuccess();
+      yield RecipieLoadSuccess(Recipie(
+          id: '', macrosConsumed: Macro(0, 0, 0), meals: [], recipeMeal: ''));
+    } catch (e) {
+      yield RecipieLoadFailure('Cannot save the recipie');
     }
   }
 
   Stream<RecipieState> _saveRecipie() async* {
     final recipie = (state as RecipieLoadSuccess).recipie;
     try {
+      // TODO: implement saving the recipie
       final isNewRecipie = recipie.id == '';
       Recipie newRecipie;
       final recipieId = uuidd.v4();
@@ -58,13 +76,18 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
     yield RecipieLoading();
     try {
       final mealId = event.mealId;
+      final oldProtein = recipie.macrosConsumed.protein;
+      final oldCarbs = recipie.macrosConsumed.carbs;
+      final oldFats = recipie.macrosConsumed.fats;
       if (recipie.meals.length < 0 && recipie.id != "")
         RecipieLoadFailure(
             'The recipie cannot be empty please, delete via the trash icon.');
       else {
         if (recipie.id != '') await recipieItemRepository.deleteItem(mealId);
-        recipie.recipieMeals.removeWhere((meal) => meal.id == mealId);
+        recipie.meals.removeWhere((meal) => meal.id == mealId);
+        //TODO: update the macros when deleted
       }
+      //final newRecipie = Recipie(id: recipie.id,macrosConsumed: Macro(oldProtein-))
       yield RecipieLoadSuccess(recipie);
     } catch (e) {
       RecipieLoadFailure('Couldn\'t delete the given meal.');
@@ -92,6 +115,7 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
     try {
       final isNewRecipie = recipie.id == '';
       final newMeal = event.meal;
+      newMeal.setOrigin = MealOrigin.Recipie;
       final recipieIdMeal = uuidd.v4();
       final trackMealItem = RecipieItem(
           id: recipieIdMeal,

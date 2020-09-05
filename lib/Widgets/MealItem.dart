@@ -10,8 +10,10 @@ import '../screens/meal_preview.dart';
 class MealItemWidget extends StatelessWidget {
   final MealItem mealItem;
   final MealGroupName groupName;
+  final MealOrigin origin;
   final bool isDismissible;
-  MealItemWidget(this.mealItem, this.isDismissible, [this.groupName]);
+  MealItemWidget(this.mealItem, this.isDismissible, this.origin,
+      [this.groupName]);
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,7 @@ class MealItemWidget extends StatelessWidget {
         var arguments = {
           "meal": mealItem,
           "groupName": groupName,
+          "origin": origin
         };
         // print(groupName);
         // final isFromRecipie = groupName == null;

@@ -1,4 +1,5 @@
 import 'package:HIIT/Widgets/meal_view/macros_slim.dart';
+import 'package:HIIT/bloc/Model/MealItem.dart';
 import 'package:HIIT/bloc/bloc.dart';
 import 'package:HIIT/inputs/add-recipie.dart';
 import 'package:flutter/material.dart';
@@ -20,12 +21,13 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
   Map<String, dynamic> _recipieName = createRecipie({'recipieName': ''});
   var isInit = true;
   var isNewRecipie = true;
+  var recipieId = '';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (isInit) {
-      final recipieId = ModalRoute.of(context).settings.arguments;
+      recipieId = ModalRoute.of(context).settings.arguments;
       isInit = false;
       if (recipieId == null) {
         BlocProvider.of<RecipieBloc>(context).add(LoadRecipieMeals(''));
@@ -48,22 +50,53 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
         title: Text('Add your recipie'),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.add_circle),
+              icon: Icon(isNewRecipie ? Icons.save : Icons.delete),
               color: Colors.white,
-              iconSize: 40,
+              iconSize: 35,
               enableFeedback: true,
               onPressed: () {
-                BlocProvider.of<RecipieBloc>(context).add(SaveRecipie());
+                if (isNewRecipie)
+                  BlocProvider.of<RecipieBloc>(context).add(SaveRecipie());
+                else
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Text(
+                                'Do you really want to remove this recipie?',
+                                style: Theme.of(context).textTheme.subtitle),
+                            actions: <Widget>[
+                              BlocListener<TrackBloc, TrackState>(
+                                listener: (context, state) {},
+                                child: FlatButton(
+                                  child: Text('Yes'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                ),
+                              ),
+                              FlatButton(
+                                child: Text('No',
+                                    style: TextStyle(color: Colors.red)),
+                                onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                              )
+                            ],
+                          )).then((isDeleted) {
+                    if (isDeleted)
+                      BlocProvider.of<RecipieBloc>(context)
+                          .add(DeleteRecipie(recipieId));
+                  });
               })
         ],
       ),
       body: BlocConsumer<RecipieBloc, RecipieState>(
         listener: (context, state) {
           if (state is RecipieLoadSuccess) {
-            Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('Loaded Successfully'),
-              backgroundColor: Theme.of(context).primaryColor,
-            ));
+            // Scaffold.of(context).showSnackBar(SnackBar(
+            //   content: Text('Loaded Successfully'),
+            //   backgroundColor: Theme.of(context).primaryColor,
+            // ));
           }
           if (state is RecipieLoadFailure) {
             Scaffold.of(context).showSnackBar(SnackBar(
@@ -113,7 +146,8 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
             icon: Icon(Icons.add),
             color: Theme.of(context).primaryColor,
             onPressed: () {
-              Navigator.of(context).pushNamed(Search.routeName);
+              Navigator.of(context)
+                  .pushNamed(Search.routeName, arguments: MealOrigin.Recipie);
             }),
       ),
     );

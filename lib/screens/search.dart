@@ -1,9 +1,10 @@
 import 'package:HIIT/bloc/Model/MealItem.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/meal/meal_bloc.dart';
-import '../Widgets/MealItem.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import '../Widgets/MealItem.dart';
+import '../bloc/meal/meal_bloc.dart';
 
 class Search extends StatefulWidget {
   static const routeName = '/search';
@@ -19,6 +20,7 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
+    final origin = ModalRoute.of(context).settings.arguments as MealOrigin;
     meals = (BlocProvider.of<MealBloc>(context).state as MealLoadSuccess)
         .myMeals
         .where((meal) =>
@@ -66,8 +68,9 @@ class _SearchState extends State<Search> {
             ),
             body: meals.length > 0
                 ? ListView.builder(
-                    itemBuilder: (context, i) =>
-                        MealItemWidget(meals[i], false),
+                    itemBuilder: (context, i) {
+                      return MealItemWidget(meals[i], false, origin);
+                    },
                     itemCount: meals.length,
                   )
                 : Center(

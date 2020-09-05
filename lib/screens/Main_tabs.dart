@@ -1,17 +1,18 @@
 import 'package:HIIT/bloc/Model/GoalItem.dart';
 import 'package:HIIT/screens/Add_goal.dart';
-import '../bloc/Model/model.dart';
-import './Configuration.dart';
-import '../Widgets/Main_Drawer.dart';
-import 'package:flutter/material.dart';
-import './Tracking.dart';
-import './Add_Meal.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import './search.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+
+import './Add_Meal.dart';
+import './Configuration.dart';
+import './Tracking.dart';
+import './search.dart';
+import '../Widgets/Main_Drawer.dart';
+import '../bloc/Model/model.dart';
+import '../bloc/bloc.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -137,7 +138,8 @@ class _MainScreenState extends State<MainScreen>
                   size: 25,
                 ),
                 onPressed: () {
-                  Navigator.of(context).pushNamed(Search.routeName);
+                  Navigator.of(context)
+                      .pushNamed(Search.routeName, arguments: MealOrigin.Track);
                 },
               ),
             )

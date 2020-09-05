@@ -22,3 +22,5 @@ class RecipieLoadFailure extends RecipieState {
   final String message;
   RecipieLoadFailure(this.message);
 }
+
+class RecipieDeleteSuccess extends RecipieState {}
