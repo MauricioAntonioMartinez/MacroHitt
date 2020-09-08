@@ -19,6 +19,7 @@ class AddRecipieWidget extends StatefulWidget {
 
 class _AddRecipieWidgetState extends State<AddRecipieWidget> {
   Map<String, dynamic> _recipieName = createRecipie({'recipieName': ''});
+  final _form = GlobalKey<FormState>();
   var isInit = true;
   var isNewRecipie = true;
   var recipieId = '';
@@ -43,6 +44,18 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
     }
   }
 
+  void saveForm() {
+    final isValid = _form.currentState.validate();
+
+    if (isValid) {
+      _form.currentState.save();
+
+      BlocProvider.of<RecipieBloc>(context)
+          .add(SaveRecipie(_recipieName['value']));
+      //Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +69,7 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
               enableFeedback: true,
               onPressed: () {
                 if (isNewRecipie)
-                  BlocProvider.of<RecipieBloc>(context).add(SaveRecipie());
+                  saveForm();
                 else
                   showDialog(
                       context: context,
@@ -92,11 +105,17 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
       ),
       body: BlocConsumer<RecipieBloc, RecipieState>(
         listener: (context, state) {
-          if (state is RecipieLoadSuccess) {
-            // Scaffold.of(context).showSnackBar(SnackBar(
-            //   content: Text('Loaded Successfully'),
-            //   backgroundColor: Theme.of(context).primaryColor,
-            // ));
+          if (state is RecipieSavedSuccess) {
+            Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text('Saved Successfully'),
+              backgroundColor: Theme.of(context).primaryColor,
+            ));
+          }
+          if (state is RecipieDeleteSuccess) {
+            Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text('Delete Successfully'),
+              backgroundColor: Theme.of(context).primaryColor,
+            ));
           }
           if (state is RecipieLoadFailure) {
             Scaffold.of(context).showSnackBar(SnackBar(
@@ -113,13 +132,21 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                 child: Column(
               children: <Widget>[
                 Header('Name your recipie'),
-                CustomTextField(
-                  props: _recipieName,
-                  onChange: (val) {
-                    setState(() {
-                      _recipieName['value'] = val;
-                    });
-                  },
+                Form(
+                  key: _form,
+                  child: CustomTextField(
+                    props: _recipieName,
+                    onChange: (val) {
+                      setState(() {
+                        _recipieName['value'] = val;
+                      });
+                    },
+                    onSubmited: (val) {
+                      if (!isNewRecipie && val != '')
+                        BlocProvider.of<RecipieBloc>(context)
+                            .add(UpdateRecipieName(val));
+                    },
+                  ),
                 ),
                 MacrosSlim(
                   calories: macros.getCalories,

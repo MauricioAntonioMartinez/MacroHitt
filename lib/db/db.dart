@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -12,7 +13,37 @@ Future<Database> db() async {
       //  db.rawQuery('ALTER TABLE goal ADD COLUMN isActive BOOLEAN');
       //print(await db.query('goal'));
       //db.rawQuery('DELETE FROM goal');
-      print(await db.query('recipie', where: "id=?", whereArgs: ['2']));
+      //final c = await db.rawQuery('pragma table_info("recipie");');
+      //  print(c);
+      // await db.execute('DROP TABLE recipie');
+      print(await db.query('recipie'));
+      print(await db.query('recipie_meal'));
+//       await db.execute('''
+//       CREATE TABLE recipie
+// (
+//     id TEXT PRIMARY KEY,
+//     recipename TEXT,
+//     protein REAL,
+//     carbs REAL,
+//     fats REAL
+// );
+
+// CREATE TABLE recipie_meal
+// (
+//     id TEXT PRIMARY KEY ,
+//     meal_id TEXT NOT NULL,
+//     recipie_id TEXT NOT NULL,
+//     qty REAL NOT NULL,
+//     FOREIGN KEY
+// (recipie)
+//        REFERENCES recipie
+// (id) ,
+//     FOREIGN KEY
+// (meal_id)
+//        REFERENCES mealitem
+// (id)
+// );
+//       ''');
       //print(await db.query('meal_group'));
       // db.rawQuery('DELETE FROM track');
 

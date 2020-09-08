@@ -3,11 +3,19 @@ import 'package:HIIT/bloc/Model/model.dart';
 import './Macro.dart';
 
 class Recipie extends Macro {
-  final String id;
-  final String recipeMeal;
+  String id;
+  String recipeMeal;
   List<MealItem> meals = [];
   List<RecipieItem> recipieMeals = [];
   Macro macrosConsumed;
+
+  set setRecipieMeal(String recipieName) {
+    this.recipeMeal = recipieName;
+  }
+
+  set setId(String id) {
+    this.id = id;
+  }
 
   Recipie({this.id, this.meals, this.recipeMeal, this.macrosConsumed})
       : super(
@@ -40,29 +48,19 @@ class Recipie extends Macro {
   }
 
   double get getTotalCalories {
-    return this.meals.fold(
-        0,
-        (acc, meals) =>
-            acc + 1.1); //meals.fold(0, (acc, meal) => meal.getCalories));
+    return this.meals.fold(0, (acc, meals) => acc + 1.1);
   }
 
   double get getProtein {
-    return this.meals.fold(
-        0,
-        (acc, meal) =>
-            acc + 1.1); //meal.fold(0, (acc, meal) => meal.getProtein));
+    return this.meals.fold(0, (acc, meal) => acc + 1.1);
   }
 
   double get getCarbs {
-    return this.meals.fold(
-        0,
-        (acc, meal) =>
-            acc + 1.1); //meal.fold(0, (acc, meal) => meal.getCarbs));
+    return this.meals.fold(0, (acc, meal) => acc + 1.1);
   }
 
   double get getFats {
-    return this.meals.toList().fold(0,
-        (acc, meal) => acc + 1.1); //meal.fold(0, (acc, meal) => meal.getFats));
+    return this.meals.toList().fold(0, (acc, meal) => acc + 1.1);
   }
 
   Map<String, dynamic> toMap() {

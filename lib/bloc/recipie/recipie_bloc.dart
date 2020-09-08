@@ -38,17 +38,22 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
     } else if (event is DeleteMealRecipie) {
       yield* _deleteMealRecipie(event);
     } else if (event is SaveRecipie) {
-      yield* _saveRecipie();
+      yield* _saveRecipie(event);
     } else if (event is DeleteRecipie) {
       yield* _deleteRecipie();
+    } else if (event is UpdateRecipieName) {
+      yield* _updateRecipieName(event);
     }
   }
+
+  Stream<RecipieState> _updateRecipieName(UpdateRecipieName event) async* {}
 
   Stream<RecipieState> _deleteRecipie() async* {
     yield RecipieLoading();
     final recipie = (state as RecipieLoadSuccess).recipie;
     try {
       await recipieRepository.deleteItem(recipie.id);
+
       yield RecipieDeleteSuccess();
       yield RecipieLoadSuccess(Recipie(
           id: '', macrosConsumed: Macro(0, 0, 0), meals: [], recipeMeal: ''));
@@ -57,15 +62,23 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
     }
   }
 
-  Stream<RecipieState> _saveRecipie() async* {
+  Stream<RecipieState> _saveRecipie(SaveRecipie event) async* {
     final recipie = (state as RecipieLoadSuccess).recipie;
     try {
-      // TODO: implement saving the recipie
-      final isNewRecipie = recipie.id == '';
-      Recipie newRecipie;
+      final recipieName = event.recipieName;
+      recipie.setRecipieMeal = recipieName;
       final recipieId = uuidd.v4();
-      if (isNewRecipie)
-        newRecipie = await recipieRepository.addItem(recipie, recipieId);
+      recipie.setId = recipieId;
+      await recipieRepository.addItem(recipie);
+      for (final meal in recipie.meals) {
+        await recipieItemRepository.addItem(RecipieItem(
+            id: uuidd.v4(),
+            mealId: meal.id,
+            qty: meal.servingSize,
+            recipieId: recipieId));
+      }
+      yield RecipieSavedSuccess();
+      yield RecipieLoadSuccess(recipie);
     } catch (e) {
       RecipieLoadFailure('CANNOT SAVE THE RECIPIE');
     }
@@ -79,16 +92,27 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
       final oldProtein = recipie.macrosConsumed.protein;
       final oldCarbs = recipie.macrosConsumed.carbs;
       final oldFats = recipie.macrosConsumed.fats;
-      if (recipie.meals.length < 0 && recipie.id != "")
+      if (recipie.meals.length < 0 && recipie.id != "") {
         RecipieLoadFailure(
             'The recipie cannot be empty please, delete via the trash icon.');
-      else {
+        yield RecipieLoadSuccess(recipie);
+      } else {
         if (recipie.id != '') await recipieItemRepository.deleteItem(mealId);
-        recipie.meals.removeWhere((meal) => meal.id == mealId);
-        //TODO: update the macros when deleted
+        final removeItemIndex =
+            recipie.meals.indexWhere((meal) => meal.id == mealId);
+        final mealProtein = recipie.meals[removeItemIndex].protein;
+        final mealCarbs = recipie.meals[removeItemIndex].carbs;
+        final mealFats = recipie.meals[removeItemIndex].fats;
+        recipie.meals.removeAt(removeItemIndex);
+        final newRecipie = Recipie(
+            id: recipie.id,
+            macrosConsumed: Macro(oldProtein - mealProtein,
+                oldCarbs - mealCarbs, oldFats - mealFats),
+            meals: recipie.meals,
+            recipeMeal: recipie.recipeMeal);
+
+        yield RecipieLoadSuccess(newRecipie);
       }
-      //final newRecipie = Recipie(id: recipie.id,macrosConsumed: Macro(oldProtein-))
-      yield RecipieLoadSuccess(recipie);
     } catch (e) {
       RecipieLoadFailure('Couldn\'t delete the given meal.');
     }

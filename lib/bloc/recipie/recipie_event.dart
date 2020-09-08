@@ -22,9 +22,17 @@ class DeleteMealRecipie extends RecipieEvent {
   DeleteMealRecipie(this.mealId);
 }
 
-class SaveRecipie extends RecipieEvent {}
+class SaveRecipie extends RecipieEvent {
+  final String recipieName;
+  SaveRecipie(this.recipieName);
+}
 
 class DeleteRecipie extends RecipieEvent {
   final String recipieId;
   DeleteRecipie(this.recipieId);
+}
+
+class UpdateRecipieName extends RecipieEvent {
+  final String recipieName;
+  UpdateRecipieName(this.recipieName);
 }

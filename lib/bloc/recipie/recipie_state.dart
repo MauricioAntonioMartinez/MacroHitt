@@ -24,3 +24,5 @@ class RecipieLoadFailure extends RecipieState {
 }
 
 class RecipieDeleteSuccess extends RecipieState {}
+
+class RecipieSavedSuccess extends RecipieState {}

@@ -8,14 +8,13 @@ import '../Model/Recipie.dart';
 import '../Model/model.dart';
 
 class RecipieRepository implements CRUD<Recipie> {
-  Future<Recipie> addItem(Recipie recipie, [String id]) async {
+  Future<Recipie> addItem(Recipie recipie) async {
     final database = await db();
     await database.insert(
-      'Recipie',
+      'recipie',
       {
-        'id': id,
-        'recipieId': recipie.id,
-        'recipieMeal': recipie.recipeMeal,
+        'id': recipie.id,
+        'recipename': recipie.recipeMeal,
         'protein': recipie.getProtein,
         'carbs': recipie.getCarbs,
         'fats': recipie.getFats,
@@ -23,7 +22,7 @@ class RecipieRepository implements CRUD<Recipie> {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     return Recipie(
-        id: id,
+        id: recipie.id,
         recipeMeal: recipie.recipeMeal,
         macrosConsumed: Macro(0, 0, 0),
         meals: []);

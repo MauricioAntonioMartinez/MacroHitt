@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatelessWidget {
   final Map<String, dynamic> props;
   final Function onChange;
+  final Function onSubmited;
 
-  CustomTextField({this.props, this.onChange});
+  CustomTextField({this.props, this.onChange, this.onSubmited});
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +36,10 @@ class CustomTextField extends StatelessWidget {
                   style: Theme.of(context).textTheme.caption,
                   onChanged: (value) {
                     onChange(value);
+                  },
+                  onFieldSubmitted: (val) {
+                    onSubmited(val);
+                    print(val);
                   },
                 ),
               ),

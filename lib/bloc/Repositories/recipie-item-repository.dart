@@ -1,8 +1,9 @@
-import '../Model/model.dart';
-import '../../db/db.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../db/db.dart';
 import '../Model/Crud.dart';
+import '../Model/model.dart';
 
 class RecipieItemRepository implements CRUD<RecipieItem> {
   final uuid = Uuid();
@@ -16,11 +17,11 @@ class RecipieItemRepository implements CRUD<RecipieItem> {
     return recipieItem;
   }
 
-  Future<void> deleteItem(String mealId, [RecipieItem meal]) async {
+  Future<void> deleteItem(String mealId, [String recipieId]) async {
     final database = await db();
     database.delete(
       'recipie_meal',
-      whereArgs: [mealId, meal.recipieId],
+      whereArgs: [mealId, recipieId],
       where: 'meal_id=?  AND recipie_id=?',
     );
   }
