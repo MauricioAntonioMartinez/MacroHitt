@@ -7,6 +7,8 @@ abstract class RecipieEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class LoadRecipies extends RecipieEvent {}
+
 class LoadRecipieMeals extends RecipieEvent {
   final String recipieId;
   LoadRecipieMeals(this.recipieId);

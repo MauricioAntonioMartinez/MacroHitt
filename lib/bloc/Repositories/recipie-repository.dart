@@ -3,18 +3,17 @@ import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 
 import '../../db/db.dart';
-import '../Model/Crud.dart';
 import '../Model/Recipie.dart';
 import '../Model/model.dart';
 
-class RecipieRepository implements CRUD<Recipie> {
+class RecipieRepository {
   Future<Recipie> addItem(Recipie recipie) async {
     final database = await db();
     await database.insert(
       'recipie',
       {
         'id': recipie.id,
-        'recipename': recipie.recipeMeal,
+        'recipieName': recipie.recipeMeal,
         'protein': recipie.getProtein,
         'carbs': recipie.getCarbs,
         'fats': recipie.getFats,
@@ -43,18 +42,34 @@ class RecipieRepository implements CRUD<Recipie> {
           'protein': macro.protein,
           'fats': macro.fats,
           'carbs': macro.carbs,
-          'recipieMeal': recipie.recipeMeal
+          'recipieName': recipie.recipeMeal
         },
         where: 'id=?',
         whereArgs: [recipie.id]);
     return recipie;
   }
 
-  Future<List<Recipie>> findItems() async {}
+  Future<List<MealItem>> findItems() async {
+    final database = await db();
+    final recipies = await database.query('recipie');
+
+    return recipies.map((r) {
+      return MealItem(
+          servingName: 'serving',
+          brandName: "",
+          carbs: r['carbs'],
+          fats: r['carbs'],
+          protein: r['protein'],
+          origin: MealOrigin.Recipie,
+          mealName: r['recipieName'],
+          id: r['id'],
+          servingSize: 1);
+    }).toList();
+  }
 
   Future<Recipie> findItem(String recipieId, [List<MealItem> userMeals]) async {
     final database = await db();
-    final List<Map<String, dynamic>> recipie =
+    final recipie =
         await database.query('recipie', where: "id=?", whereArgs: [recipieId]);
 
     if (recipie.length < 1)
@@ -71,8 +86,15 @@ class RecipieRepository implements CRUD<Recipie> {
           qty: meal['qty'],
           recipieId: meal['recipie_id']));
     });
-    final recipieMeal = recipie[0]['recipieMeal'];
+    final recipieName = recipie[0]['recipieName'];
+    final protein = recipie[0]['protein'];
+    final carbs = recipie[0]['carbs'];
+    final fats = recipie[0]['fats'];
     final meals = Recipie.recipieMealsToItemMeals(userMeals, recipieMeals);
-    return Recipie(id: recipieId, recipeMeal: recipieMeal, meals: meals);
+    return Recipie(
+        id: recipieId,
+        recipeMeal: recipieName,
+        meals: meals,
+        macrosConsumed: Macro(protein, carbs, fats));
   }
 }

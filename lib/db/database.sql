@@ -84,7 +84,7 @@ VALUES('1', 1, 'MyGoal', 180, 250, 60);
 CREATE TABLE recipie
 (
     id TEXT PRIMARY KEY,
-    recipeMeal TEXT,
+    recipieName TEXT,
     protein REAL,
     carbs REAL,
     fats REAL

@@ -1,4 +1,5 @@
 import 'package:HIIT/bloc/Model/MealItem.dart';
+import 'package:HIIT/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -17,6 +18,16 @@ class _SearchState extends State<Search> {
   final _controller = TextEditingController();
   String matchingName = '';
   List<MealItem> meals = [];
+  List<MealItem> recipieMeas = [];
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(seconds: 1)).then((_) {
+      // final recipies =
+      //     (BlocProvider.of<RecipieBloc>(context).state as Recipies).recipies;
+      print((BlocProvider.of<RecipieBloc>(context).state as Recipies).recipies);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

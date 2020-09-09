@@ -9,7 +9,6 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(props);
     final initialValue =
         props['initialValue'] == null ? '' : props['initialValue'];
     return Column(
@@ -34,13 +33,8 @@ class CustomTextField extends StatelessWidget {
                       hintText: props['placeholder']),
                   validator: props['validator'],
                   style: Theme.of(context).textTheme.caption,
-                  onChanged: (value) {
-                    onChange(value);
-                  },
-                  onFieldSubmitted: (val) {
-                    onSubmited(val);
-                    print(val);
-                  },
+                  onChanged: onChange,
+                  onFieldSubmitted: onSubmited,
                 ),
               ),
             ],

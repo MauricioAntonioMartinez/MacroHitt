@@ -17,7 +17,14 @@ void main() {
         return MealBloc(mealItemRepository: MealItemRepository())
           ..add(MealLoad());
       },
-      child: MyApp()));
+      child: BlocProvider<RecipieBloc>(
+        create: (context) => RecipieBloc(
+          mealBloc: BlocProvider.of<MealBloc>(context),
+          recipieItemRepository: RecipieItemRepository(),
+          recipieRepository: RecipieRepository(),
+        )..add(LoadRecipies()),
+        child: MyApp(),
+      )));
 }
 
 class MyApp extends StatefulWidget {
@@ -27,6 +34,14 @@ class MyApp extends StatefulWidget {
 
 //#42C9B7
 class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(seconds: 1)).then((value) {
+      BlocProvider.of<RecipieBloc>(context).add(LoadRecipies());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -40,12 +55,6 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<GoalBloc>(
           create: (_) => GoalBloc(goalsRepository: GoalItemRepository()),
         ),
-        BlocProvider<RecipieBloc>(
-          create: (_) => RecipieBloc(
-              mealBloc: BlocProvider.of(context),
-              recipieItemRepository: RecipieItemRepository(),
-              recipieRepository: RecipieRepository()),
-        )
       ],
       child: MaterialApp(
         title: 'Macro Hitt',

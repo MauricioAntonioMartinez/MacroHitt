@@ -36,10 +36,6 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
         isNewRecipie = false;
       }
 
-      // if (goal.id != '') {
-      //   _isEditMode = true;
-      // }
-
       _recipieName = createRecipie({'recipieName': ''});
     }
   }
@@ -49,10 +45,8 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
 
     if (isValid) {
       _form.currentState.save();
-
       BlocProvider.of<RecipieBloc>(context)
           .add(SaveRecipie(_recipieName['value']));
-      //Navigator.of(context).pop();
     }
   }
 
@@ -110,6 +104,9 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
               content: Text('Saved Successfully'),
               backgroundColor: Theme.of(context).primaryColor,
             ));
+            Future.delayed(Duration(seconds: 1)).then((_) {
+              Navigator.of(context).pop();
+            });
           }
           if (state is RecipieDeleteSuccess) {
             Scaffold.of(context).showSnackBar(SnackBar(
@@ -155,7 +152,9 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                   protein: macros.protein,
                 ),
                 Divider(),
-                MealWidget(meals)
+                MealWidget(
+                  meals,
+                )
               ],
             ));
           }

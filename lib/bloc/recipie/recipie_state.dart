@@ -2,9 +2,13 @@ part of 'recipie_bloc.dart';
 
 abstract class RecipieState extends Equatable {
   const RecipieState();
-
   @override
   List<Object> get props => [];
+}
+
+class Recipies extends RecipieState {
+  final List<MealItem> recipies;
+  Recipies(this.recipies);
 }
 
 class RecipieInitial extends RecipieState {}

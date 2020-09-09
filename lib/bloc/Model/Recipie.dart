@@ -8,6 +8,7 @@ class Recipie extends Macro {
   List<MealItem> meals = [];
   List<RecipieItem> recipieMeals = [];
   Macro macrosConsumed;
+  double servingSize;
 
   set setRecipieMeal(String recipieName) {
     this.recipeMeal = recipieName;
@@ -17,7 +18,12 @@ class Recipie extends Macro {
     this.id = id;
   }
 
-  Recipie({this.id, this.meals, this.recipeMeal, this.macrosConsumed})
+  Recipie(
+      {@required this.id,
+      @required this.meals,
+      @required this.recipeMeal,
+      @required this.macrosConsumed,
+      this.servingSize})
       : super(
             macrosConsumed.protein, macrosConsumed.carbs, macrosConsumed.fats);
 

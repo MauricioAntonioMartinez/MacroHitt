@@ -19,10 +19,19 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
   RecipieBloc(
       {this.mealBloc, this.recipieRepository, this.recipieItemRepository})
       : super(RecipieLoading()) {
-    //final recipieId = (state as RecipieLoadSuccess).recipie;
+    var recipieId;
+
+    // if (state is RecipieLoadSuccess){
+
+    // }
+
     mealTrackGroupSubscription = mealBloc.listen((state) {
       if (state is MealLoadSuccess) {
-        //  add(LoadRecipieMeals(recipieId.id));
+        if (recipieId !=
+            null) // if we are in edit and want to update the meals if the user changed
+          add(LoadRecipieMeals(''));
+        else
+          add(LoadRecipies()); //Load all the recipies, for search tracking
       }
     });
   }
@@ -31,7 +40,9 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
   Stream<RecipieState> mapEventToState(
     RecipieEvent event,
   ) async* {
-    if (event is LoadRecipieMeals) {
+    if (event is LoadRecipies) {
+      yield* _loadRecipies();
+    } else if (event is LoadRecipieMeals) {
       yield* _loadRecipie(event);
     } else if (event is AddEditMealRecipie) {
       yield* _addEditMeal(event);
@@ -43,6 +54,15 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
       yield* _deleteRecipie();
     } else if (event is UpdateRecipieName) {
       yield* _updateRecipieName(event);
+    }
+  }
+
+  Stream<RecipieState> _loadRecipies() async* {
+    try {
+      final recipies = await recipieRepository.findItems();
+      yield Recipies(recipies);
+    } catch (e) {
+      yield RecipieLoadFailure('Cannot load your recipies');
     }
   }
 
@@ -65,19 +85,24 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
   Stream<RecipieState> _saveRecipie(SaveRecipie event) async* {
     final recipie = (state as RecipieLoadSuccess).recipie;
     try {
-      final recipieName = event.recipieName;
-      recipie.setRecipieMeal = recipieName;
-      final recipieId = uuidd.v4();
-      recipie.setId = recipieId;
-      await recipieRepository.addItem(recipie);
-      for (final meal in recipie.meals) {
-        await recipieItemRepository.addItem(RecipieItem(
-            id: uuidd.v4(),
-            mealId: meal.id,
-            qty: meal.servingSize,
-            recipieId: recipieId));
+      if (recipie.meals.length < 1) {
+        yield RecipieLoadFailure('No meals added.');
+      } else {
+        final recipieName = event.recipieName;
+        recipie.setRecipieMeal = recipieName;
+        final recipieId = uuidd.v4();
+        recipie.setId = recipieId;
+        await recipieRepository.addItem(recipie);
+        for (final meal in recipie.meals) {
+          await recipieItemRepository.addItem(RecipieItem(
+              id: uuidd.v4(),
+              mealId: meal.id,
+              qty: meal.servingSize,
+              recipieId: recipieId));
+        }
+        yield RecipieSavedSuccess();
       }
-      yield RecipieSavedSuccess();
+
       yield RecipieLoadSuccess(recipie);
     } catch (e) {
       RecipieLoadFailure('CANNOT SAVE THE RECIPIE');
