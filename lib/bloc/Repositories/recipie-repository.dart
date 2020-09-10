@@ -14,9 +14,9 @@ class RecipieRepository {
       {
         'id': recipie.id,
         'recipieName': recipie.recipeMeal,
-        'protein': recipie.getProtein,
-        'carbs': recipie.getCarbs,
-        'fats': recipie.getFats,
+        'protein': recipie.protein,
+        'carbs': recipie.carbs,
+        'fats': recipie.fats,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -68,6 +68,11 @@ class RecipieRepository {
   }
 
   Future<Recipie> findItem(String recipieId, [List<MealItem> userMeals]) async {
+    if (recipieId == null) {
+      return Recipie(
+          id: '', recipeMeal: '', macrosConsumed: Macro(0, 0, 0), meals: []);
+    }
+
     final database = await db();
     final recipie =
         await database.query('recipie', where: "id=?", whereArgs: [recipieId]);

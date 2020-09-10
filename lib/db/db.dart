@@ -10,6 +10,8 @@ Future<Database> db() async {
   return openDatabase(
     await getPaht(),
     onOpen: (db) async {
+      //await db.rawQuery('DELETE FROM recipie_meal');
+      //await db.rawQuery('DELETE FROM recipie');
       //print(await db.rawQuery('DELETE FROM recipie_meal'));
     },
     onCreate: (db, version) {

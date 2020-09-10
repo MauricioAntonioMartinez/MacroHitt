@@ -1,3 +1,5 @@
+import 'package:HIIT/Widgets/Meal/dismissiable_meal.dart';
+import 'package:HIIT/Widgets/Meal/meal_info.dart';
 import 'package:HIIT/Widgets/meal_view/macros_slim.dart';
 import 'package:HIIT/bloc/Model/MealItem.dart';
 import 'package:HIIT/bloc/bloc.dart';
@@ -5,7 +7,6 @@ import 'package:HIIT/inputs/add-recipie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../Widgets/Meals.dart';
 import '../Widgets/UI/Header.dart';
 import '../Widgets/UI/TextField.dart';
 import '../screens/search.dart';
@@ -23,6 +24,7 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
   var isInit = true;
   var isNewRecipie = true;
   var recipieId = '';
+  var isEditMode = false;
 
   @override
   void didChangeDependencies() {
@@ -30,19 +32,16 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
     if (isInit) {
       recipieId = ModalRoute.of(context).settings.arguments;
       isInit = false;
-      if (recipieId == null) {
-        BlocProvider.of<RecipieBloc>(context).add(LoadRecipieMeals(''));
-      } else {
+      BlocProvider.of<RecipieBloc>(context).add(LoadRecipieMeals(recipieId));
+      if (recipieId != null) {
         isNewRecipie = false;
+        _recipieName = createRecipie({'recipieName': ''});
       }
-
-      _recipieName = createRecipie({'recipieName': ''});
     }
   }
 
   void saveForm() {
     final isValid = _form.currentState.validate();
-
     if (isValid) {
       _form.currentState.save();
       BlocProvider.of<RecipieBloc>(context)
@@ -51,13 +50,23 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
   }
 
   @override
+  void deactivate() {
+    BlocProvider.of<RecipieBloc>(context).add(LoadRecipies());
+    super.deactivate();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add your recipie'),
+        title: Text(isNewRecipie
+            ? 'Add your recipie'
+            : isEditMode ? "Update your recipie" : "Your Recipie"),
         actions: <Widget>[
           IconButton(
-              icon: Icon(isNewRecipie ? Icons.save : Icons.delete),
+              icon: Icon(isNewRecipie
+                  ? Icons.save
+                  : isEditMode ? Icons.delete : Icons.edit),
               color: Colors.white,
               iconSize: 35,
               enableFeedback: true,
@@ -94,7 +103,15 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                       BlocProvider.of<RecipieBloc>(context)
                           .add(DeleteRecipie(recipieId));
                   });
-              })
+              }),
+          if (isEditMode)
+            IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {
+                  setState(() {
+                    isEditMode = true;
+                  });
+                })
         ],
       ),
       body: BlocConsumer<RecipieBloc, RecipieState>(
@@ -104,6 +121,7 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
               content: Text('Saved Successfully'),
               backgroundColor: Theme.of(context).primaryColor,
             ));
+            BlocProvider.of<RecipieBloc>(context).add(LoadRecipies());
             Future.delayed(Duration(seconds: 1)).then((_) {
               Navigator.of(context).pop();
             });
@@ -128,10 +146,14 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
             return SingleChildScrollView(
                 child: Column(
               children: <Widget>[
-                Header('Name your recipie'),
+                Header(isEditMode || isNewRecipie
+                    ? 'Name your recipie'
+                    : state.recipie.recipeMeal),
                 Form(
                   key: _form,
                   child: CustomTextField(
+                    //TODO: Switch to name recipie and qty input
+                    isEditMode: isEditMode || isNewRecipie,
                     props: _recipieName,
                     onChange: (val) {
                       setState(() {
@@ -152,9 +174,15 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                   protein: macros.protein,
                 ),
                 Divider(),
-                MealWidget(
-                  meals,
-                )
+                ...meals
+                    .map((e) => isEditMode || isNewRecipie
+                        ? DismissiableMeal(
+                            mealItem: e,
+                          )
+                        : MealInfo(
+                            mealItem: e,
+                          ))
+                    .toList(),
               ],
             ));
           }

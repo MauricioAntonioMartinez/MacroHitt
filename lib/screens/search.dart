@@ -18,22 +18,28 @@ class _SearchState extends State<Search> {
   final _controller = TextEditingController();
   String matchingName = '';
   List<MealItem> meals = [];
-  List<MealItem> recipieMeas = [];
+  List<MealItem> searchMeals = [];
+  MealOrigin origin;
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 1)).then((_) {
-      // final recipies =
-      //     (BlocProvider.of<RecipieBloc>(context).state as Recipies).recipies;
-      print((BlocProvider.of<RecipieBloc>(context).state as Recipies).recipies);
+    Future.delayed(Duration.zero).then((_) {
+      origin = ModalRoute.of(context).settings.arguments as MealOrigin;
+      final recipieState = BlocProvider.of<RecipieBloc>(context).state;
+      final mealsState = BlocProvider.of<MealBloc>(context).state;
+      if (recipieState is Recipies) {
+        meals = [...recipieState.recipies];
+      }
+      if (mealsState is MealLoadSuccess) {
+        meals = [...meals, ...mealsState.myMeals];
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final origin = ModalRoute.of(context).settings.arguments as MealOrigin;
-    meals = (BlocProvider.of<MealBloc>(context).state as MealLoadSuccess)
-        .myMeals
+    // final origin = ModalRoute.of(context).settings.arguments as MealOrigin;
+    searchMeals = meals
         .where((meal) =>
             meal.mealName.toLowerCase().contains(matchingName.toLowerCase()))
         .toList();
@@ -77,12 +83,12 @@ class _SearchState extends State<Search> {
                 style: Theme.of(context).textTheme.caption,
               ),
             ),
-            body: meals.length > 0
+            body: searchMeals.length > 0
                 ? ListView.builder(
                     itemBuilder: (context, i) {
                       return MealItemWidget(meals[i], false, origin);
                     },
-                    itemCount: meals.length,
+                    itemCount: searchMeals.length,
                   )
                 : Center(
                     child: SvgPicture.asset(
