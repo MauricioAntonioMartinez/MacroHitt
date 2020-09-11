@@ -1,14 +1,17 @@
-import 'package:HIIT/Widgets/Meal/dismissiable_meal.dart';
-import 'package:HIIT/Widgets/Meal/meal_info.dart';
-import 'package:HIIT/Widgets/meal_view/macros_slim.dart';
+import 'package:HIIT/Widgets/Meal/MealItemDismissiable.dart';
+import 'package:HIIT/Widgets/MealInformation/MacrosSlim.dart';
+import 'package:HIIT/Widgets/MealInformation/MealItemSlimDetails.dart';
 import 'package:HIIT/bloc/Model/MealItem.dart';
 import 'package:HIIT/bloc/bloc.dart';
 import 'package:HIIT/inputs/add-recipie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../Widgets/Meal/QtyInput.dart';
 import '../Widgets/UI/Header.dart';
 import '../Widgets/UI/TextField.dart';
+import '../Widgets/UI/bottomModalSheet.dart';
+import '../bloc/Model/model.dart';
 import '../screens/search.dart';
 
 class AddRecipieWidget extends StatefulWidget {
@@ -25,15 +28,23 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
   var isNewRecipie = true;
   var recipieId = '';
   var isEditMode = false;
+  var servingSize = 1.0;
+  MealGroupName groupName = MealGroupName.BreakFast;
+  RecipieMode mode;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (isInit) {
-      recipieId = ModalRoute.of(context).settings.arguments;
       isInit = false;
-      BlocProvider.of<RecipieBloc>(context).add(LoadRecipieMeals(recipieId));
-      if (recipieId != null) {
+      final args =
+          ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+      mode = args['mode'];
+
+      BlocProvider.of<RecipieBloc>(context)
+          .add(LoadRecipieMeals(args['recipieId']));
+
+      if (args['recipieId'] != null) {
         isNewRecipie = false;
         _recipieName = createRecipie({'recipieName': ''});
       }
@@ -53,6 +64,72 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
   void deactivate() {
     BlocProvider.of<RecipieBloc>(context).add(LoadRecipies());
     super.deactivate();
+  }
+
+  List<Widget> _buildInputs(RecipieLoadSuccess state) {
+    var text = "";
+    Widget label = Text(text);
+
+    Widget widgetValue = CustomTextField(
+      isEditMode: true,
+      props: _recipieName,
+      onChange: (val) {
+        setState(() {
+          _recipieName['value'] = val;
+        });
+      },
+      onSubmited: (val) {
+        if (!isNewRecipie && val != '')
+          BlocProvider.of<RecipieBloc>(context).add(UpdateRecipieName(val));
+      },
+    );
+    final recipie = state.recipie;
+
+    switch (mode) {
+      case RecipieMode.Add:
+        text = "Track the recipie";
+        label = Expanded(
+            child: GestureDetector(
+          onTap: () {},
+          child: Row(
+            children: <Widget>[
+              Text(groupName.toString().split('MealGroupName.')[1],
+                  style: TextStyle(
+                      fontFamily: 'Questrial',
+                      fontSize: 18,
+                      color: Theme.of(context).primaryColor)),
+              Icon(Icons.expand_more)
+            ],
+          ),
+        ));
+        widgetValue = GestureDetector(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (context) => Dialog(child: QtyInput())).then((value) {
+              if (value == null) return;
+              setState(() {
+                if (value > 0) servingSize = value;
+              });
+            });
+          },
+          child: Container(
+            padding: EdgeInsets.all(6),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                color: Theme.of(context).primaryColorLight),
+            child: Text('${recipie.servingSize} Serving(s)'),
+          ),
+        );
+        break;
+      case RecipieMode.Create:
+        text = "Name your Recipie";
+        break;
+      case RecipieMode.Edit:
+        text = "Edit your Recipie";
+        break;
+    }
+    return [Header(text), buildExpanend(label, widgetValue, 20)];
   }
 
   @override
@@ -146,27 +223,8 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
             return SingleChildScrollView(
                 child: Column(
               children: <Widget>[
-                Header(isEditMode || isNewRecipie
-                    ? 'Name your recipie'
-                    : state.recipie.recipeMeal),
-                Form(
-                  key: _form,
-                  child: CustomTextField(
-                    //TODO: Switch to name recipie and qty input
-                    isEditMode: isEditMode || isNewRecipie,
-                    props: _recipieName,
-                    onChange: (val) {
-                      setState(() {
-                        _recipieName['value'] = val;
-                      });
-                    },
-                    onSubmited: (val) {
-                      if (!isNewRecipie && val != '')
-                        BlocProvider.of<RecipieBloc>(context)
-                            .add(UpdateRecipieName(val));
-                    },
-                  ),
-                ),
+                ..._buildInputs(state),
+                Divider(),
                 MacrosSlim(
                   calories: macros.getCalories,
                   carbs: macros.carbs,
@@ -179,7 +237,7 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                         ? DismissiableMeal(
                             mealItem: e,
                           )
-                        : MealInfo(
+                        : MealItemSlimDetails(
                             mealItem: e,
                           ))
                     .toList(),

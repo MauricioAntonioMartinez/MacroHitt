@@ -1,9 +1,10 @@
-import 'package:HIIT/Widgets/NoTrack.dart';
-import 'package:flutter/material.dart';
-import '../bloc/Model/model.dart';
-import '../Widgets/Meals.dart';
-import '../Widgets/Controls/Macros.dart';
+import 'package:HIIT/Widgets/Vectors/NoTrack.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
+
+import '../Widgets/MealInformation/MacrosMain.dart';
+import '../Widgets/Track/MealGroup.dart';
+import '../bloc/Model/model.dart';
 
 class Tracking extends StatelessWidget {
   final Map<MealGroupName, List<MealItem>> meals;
@@ -38,7 +39,7 @@ class Tracking extends StatelessWidget {
                   child: ListView.builder(
                       itemBuilder: (ctx, i) {
                         var groupName = meals.keys.toList()[i];
-                        return MealWidget(meals[groupName], groupName);
+                        return MealGroup(meals[groupName], groupName);
                       },
                       itemCount: meals.length)),
         ],

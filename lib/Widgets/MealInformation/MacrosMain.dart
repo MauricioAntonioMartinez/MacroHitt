@@ -1,9 +1,10 @@
 import 'package:HIIT/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import './Calories.dart';
+
 import '../../bloc/Model/model.dart';
-import '../../Widgets/UI/Skeleton.dart';
+import '../UI/Skeleton.dart';
+import 'Calories.dart';
 
 class Macros extends StatelessWidget {
   final Macro macrosConsumed;

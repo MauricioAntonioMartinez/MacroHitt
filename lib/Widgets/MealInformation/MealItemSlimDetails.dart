@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../bloc/Model/model.dart';
 
-class MealInfo extends StatelessWidget {
-  const MealInfo({
+class MealItemSlimDetails extends StatelessWidget {
+  const MealItemSlimDetails({
     Key key,
     @required this.mealItem,
   }) : super(key: key);

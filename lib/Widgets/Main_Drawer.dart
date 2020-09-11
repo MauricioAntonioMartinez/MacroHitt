@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../bloc/Model/model.dart';
 import '../screens/Add_Recipie.dart';
 import '../screens/search.dart';
 
@@ -10,7 +11,11 @@ class MainDrawer extends StatelessWidget {
     {'nav': 'Tracking', 'index': 1},
     {'nav': 'Add Goal', 'index': 0},
     {'nav': 'Search Meal', 'routeName': Search.routeName},
-    {'nav': 'Add Recipie', 'routeName': AddRecipieWidget.routeName},
+    {
+      'nav': 'Add Recipie',
+      'routeName': AddRecipieWidget.routeName,
+      "arguments": {"mode": RecipieMode.Create}
+    },
   ];
   MainDrawer(this.navAction);
 
@@ -54,7 +59,8 @@ class MainDrawer extends StatelessWidget {
                                     Navigator.of(context).pop();
                                   } else {
                                     Navigator.of(context)
-                                        .pushNamed(e['routeName'])
+                                        .pushNamed(e['routeName'],
+                                            arguments: e['arguments'])
                                         .then((value) {
                                       Navigator.of(context).pop();
                                     });

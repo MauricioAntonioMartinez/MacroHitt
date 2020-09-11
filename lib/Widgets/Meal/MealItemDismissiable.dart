@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import './meal_info.dart';
 import '../../bloc/Model/model.dart';
 import '../../bloc/bloc.dart';
+import '../MealInformation/MealItemSlimDetails.dart';
 
 class DismissiableMeal extends StatelessWidget {
   DismissiableMeal({
@@ -61,7 +61,7 @@ class DismissiableMeal extends StatelessWidget {
         child: IconButton(
             icon: Icon(Icons.delete), color: Colors.green, onPressed: null),
       ),
-      child: MealInfo(mealItem: mealItem),
+      child: MealItemSlimDetails(mealItem: mealItem),
     );
   }
 }

@@ -1,10 +1,10 @@
+import 'package:HIIT/Widgets/Vectors/NoMeals.dart';
 import 'package:HIIT/bloc/Model/MealItem.dart';
 import 'package:HIIT/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-import '../Widgets/MealItem.dart';
+import '../Widgets/Track/MealItem.dart';
 import '../bloc/meal/meal_bloc.dart';
 
 class Search extends StatefulWidget {
@@ -90,11 +90,6 @@ class _SearchState extends State<Search> {
                     },
                     itemCount: searchMeals.length,
                   )
-                : Center(
-                    child: SvgPicture.asset(
-                      'assets/vectors/404.svg',
-                      width: 300,
-                    ),
-                  )));
+                : NoMeals()));
   }
 }

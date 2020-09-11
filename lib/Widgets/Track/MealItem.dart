@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../Widgets/Meal/dismissiable_meal.dart';
-import '../Widgets/Meal/meal_info.dart';
-import '../bloc/Model/model.dart';
-import '../screens/Add_Recipie.dart';
-import '../screens/meal_preview.dart';
+import '../../bloc/Model/model.dart';
+import '../../screens/Add_Recipie.dart';
+import '../../screens/meal_preview.dart';
+import '../Meal/MealItemDismissiable.dart';
+import '../MealInformation/MealItemSlimDetails.dart';
 
 class MealItemWidget extends StatelessWidget {
   final MealItem mealItem;
@@ -24,8 +24,8 @@ class MealItemWidget extends StatelessWidget {
           "origin": origin
         };
         if (mealItem.origin == MealOrigin.Recipie)
-          Navigator.of(context)
-              .pushNamed(AddRecipieWidget.routeName, arguments: mealItem.id);
+          Navigator.of(context).pushNamed(AddRecipieWidget.routeName,
+              arguments: {"mealId": mealItem.id, "mode": RecipieMode.Add});
         else
           Navigator.of(context)
               .pushNamed(MealPreview.routeName, arguments: arguments);
@@ -36,7 +36,7 @@ class MealItemWidget extends StatelessWidget {
                 horizontal: BorderSide(color: Colors.white),
                 vertical: BorderSide(color: Colors.grey, width: 0.1))),
         child: !isDismissible
-            ? MealInfo(mealItem: mealItem)
+            ? MealItemSlimDetails(mealItem: mealItem)
             : DismissiableMeal(groupName: groupName, mealItem: mealItem),
       ),
     );

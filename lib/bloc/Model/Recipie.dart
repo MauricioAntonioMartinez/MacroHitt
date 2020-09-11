@@ -2,6 +2,8 @@ import 'package:HIIT/bloc/Model/model.dart';
 
 import './Macro.dart';
 
+enum RecipieMode { Edit, Create, Add }
+
 class Recipie extends Macro {
   String id;
   String recipeMeal;
@@ -18,12 +20,16 @@ class Recipie extends Macro {
     this.id = id;
   }
 
+  set setServingSize(double qty) {
+    this.servingSize = qty;
+  }
+
   Recipie(
       {@required this.id,
       @required this.meals,
       @required this.recipeMeal,
       @required this.macrosConsumed,
-      this.servingSize})
+      this.servingSize = 1.0})
       : super(
             macrosConsumed.protein, macrosConsumed.carbs, macrosConsumed.fats);
 

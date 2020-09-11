@@ -1,13 +1,16 @@
-import 'package:HIIT/Widgets/meal_view/qty_input.dart';
+import 'package:HIIT/Widgets/Meal/QtyInput.dart';
+import 'package:HIIT/Widgets/Vectors/NoMeals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-import './EditMeal.dart';
+import '../Widgets/Actions/PreviewActions.dart';
+import '../Widgets/MealInformation/MacrosSlim.dart';
+import '../Widgets/MealInformation/MealItemFullDetails.dart';
 import '../Widgets/UI/BottomButton.dart';
-import '../Widgets/meal_view/macros_slim.dart';
+import '../Widgets/UI/bottomModalSheet.dart';
 import '../bloc/Model/model.dart';
 import '../bloc/bloc.dart';
+import '../inputs/mealPreview.dart';
 
 class MealPreview extends StatefulWidget {
   static const routeName = '/meal-preview';
@@ -55,18 +58,6 @@ class _MealPreviewState extends State<MealPreview> {
           break;
       }
 
-      // if (mealSelected['groupName'] == null) {
-      //   meals = (BlocProvider.of<MealBloc>(context).state as MealLoadSuccess)
-      //       .myMeals;
-      //   groupName = MealGroupName.BreakFast;
-      // } else {
-      //   isTrack = true;
-      //   meals =
-      //       (BlocProvider.of<TrackBloc>(context).state as TrackLoadDaySuccess)
-      //           .trackDay
-      //           .meals[mealSelected['groupName']];
-      //   groupName = mealSelected['groupName'];
-      // }
       if (meals != null) {
         final mealFetched =
             meals.firstWhere((e) => e.id == meal.id, orElse: () => null);
@@ -90,222 +81,36 @@ class _MealPreviewState extends State<MealPreview> {
     }
   }
 
-  Widget buildExpanend(Widget a, Widget b) {
-    return Row(
-      children: <Widget>[a, Spacer(), b],
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    );
-  }
-
-  void bottomModalSheet(List<dynamic> items, Function cb, String splitPart) {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: items
-                .map((i) => GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      cb(i);
-                    },
-                    child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              i.toString().split(splitPart)[1],
-                              style: Theme.of(context).textTheme.subtitle,
-                            ),
-                          ),
-                          Container(width: double.infinity, child: Divider())
-                        ],
-                      ),
-                    )))
-                .toList(),
-          ),
-        );
-      },
-    );
+  void _changeGroupName() {
+    bottomModalSheet(
+        items: MealGroupName.values,
+        cb: (e) => setState(() {
+              groupName = e;
+            }),
+        splitPart: '.',
+        context: context);
   }
 
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> mealDetails;
-    if (meal != null)
-      mealDetails = [
-        {
-          "label": "Calories",
-          "value": meal.getCalories,
-          "color": Theme.of(context).primaryColorDark
-        },
-        {
-          "label": "Total Fats",
-          "value": meal.getFats,
-          "color": Theme.of(context).errorColor,
-          "details": [
-            {
-              "Saturated Fat":
-                  meal.saturatedFat == null ? 0.0 : meal.saturatedFat,
-            },
-            {
-              "Monosaturated Fat":
-                  meal.monosaturatedFat == null ? 0.0 : meal.monosaturatedFat,
-            },
-            {
-              "Polyunsaturated Fat": meal.polyunsaturatedFat == null
-                  ? 0.0
-                  : meal.polyunsaturatedFat
-            },
-          ],
-        },
-        {
-          "label": "TotalCarbs",
-          "value": meal.getCarbs,
-          "color": Colors.blue,
-          "details": [
-            {
-              "Sugar": meal.sugar == null ? 0.0 : meal.sugar,
-            },
-            {
-              "Fiber": meal.fiber == null ? 0.0 : meal.fiber,
-            },
-          ],
-        },
-        {"label": "Protein", "value": meal.getProtein, 'color': Colors.green},
-        {"label": "Sodium", "value": 0},
-      ];
+    if (meal != null) mealDetails = mealPreviewDetails(meal, context);
 
     return Scaffold(
       body: meal == null
-          ? Center(
-              child: SvgPicture.asset(
-                'assets/vectors/404.svg',
-                width: 300,
-              ),
-            )
+          ? NoMeals()
           : Container(
               margin: EdgeInsets.only(top: 20),
               padding: EdgeInsets.all(15),
               child: SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
-                    Container(
-                      height: 30,
-                      child: Row(
-                        children: <Widget>[
-                          if (origin != MealOrigin.Recipie)
-                            Expanded(
-                                child: GestureDetector(
-                              onTap: () {
-                                bottomModalSheet(
-                                    MealGroupName.values,
-                                    (e) => setState(() {
-                                          groupName = e;
-                                        }),
-                                    '.');
-                              },
-                              child: Row(
-                                children: <Widget>[
-                                  Text(
-                                      groupName
-                                          .toString()
-                                          .split('MealGroupName.')[1],
-                                      style: TextStyle(
-                                          fontFamily: 'Questrial',
-                                          fontSize: 18,
-                                          color:
-                                              Theme.of(context).primaryColor)),
-                                  Icon(Icons.expand_more)
-                                ],
-                              ),
-                            )),
-                          Row(
-                            children: <Widget>[
-                              IconButton(
-                                icon: Icon(
-                                  Icons.favorite,
-                                  size: 22,
-                                ),
-                                onPressed: () {},
-                              ),
-                              IconButton(
-                                  icon: Icon(
-                                    Icons.edit,
-                                    size: 22,
-                                  ),
-                                  onPressed: () {
-                                    bottomModalSheet(
-                                        [' .Edit Meal', ' .Delete Meal'],
-                                        (value) {
-                                      if (value == ' .Edit Meal') {
-                                        Navigator.of(context).pushNamed(
-                                            EditMeal.routeName,
-                                            arguments: meal);
-                                      } else {
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) => AlertDialog(
-                                                  title: Text(
-                                                      'Do you really want to delete this meal?',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .subtitle),
-                                                  actions: <Widget>[
-                                                    BlocListener<TrackBloc,
-                                                        TrackState>(
-                                                      listener:
-                                                          (context, state) {},
-                                                      child: FlatButton(
-                                                        child: Text('Yes'),
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop(true);
-                                                        },
-                                                      ),
-                                                    ),
-                                                    FlatButton(
-                                                      child: Text('No',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.red)),
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop(false);
-                                                      },
-                                                    )
-                                                  ],
-                                                )).then((isDeleted) {
-                                          if (isDeleted) {
-                                            isTrack
-                                                ? BlocProvider.of<TrackBloc>(
-                                                        context)
-                                                    .add(TrackRemoveMeal(
-                                                        meal.id, groupName))
-                                                : BlocProvider.of<MealBloc>(
-                                                        context)
-                                                    .add(MealDelete(meal.id));
-                                            Navigator.of(context)
-                                                .pushReplacementNamed('/');
-                                          }
-                                        });
-                                      }
-                                    }, '.');
-                                  })
-                            ],
-                          )
-                        ],
-                        mainAxisAlignment: origin != MealOrigin.Recipie
-                            ? MainAxisAlignment.spaceEvenly
-                            : MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                      ),
-                    ),
+                    PreviewActions(
+                        onChangeGroupName: _changeGroupName,
+                        origin: origin,
+                        groupName: groupName,
+                        meal: meal,
+                        isTrack: isTrack),
                     Divider(),
                     buildExpanend(
                         Column(
@@ -360,45 +165,7 @@ class _MealPreviewState extends State<MealPreview> {
                         protein: meal.protein,
                         calories: meal.getCalories),
                     Divider(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: mealDetails.map((e) {
-                          return Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: buildExpanend(
-                                  Text(e['label'],
-                                      style: TextStyle(
-                                          fontFamily: 'Questrial',
-                                          fontSize: 18,
-                                          color: e['color'])),
-                                  Text('${e['value'].toStringAsFixed(1)} kcal',
-                                      style: TextStyle(
-                                          fontFamily: 'Questrial',
-                                          fontSize: 18,
-                                          color: e['color'])),
-                                ),
-                              ),
-                              if (e['details'] != null)
-                                Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Column(
-                                      children: ((e['details']
-                                              as List<Map<String, double>>)
-                                          .map((e) {
-                                        final key = e.keys.toList()[0];
-                                        return buildExpanend(
-                                            Text(key), Text(e[key].toString()));
-                                      }).toList() as List<Widget>),
-                                    )),
-                              Divider()
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ),
+                    MealItemFullDetails(mealDetails: mealDetails),
                   ],
                 ),
               ),

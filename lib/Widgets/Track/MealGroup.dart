@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../bloc/Model/model.dart';
+import '../../bloc/Model/model.dart';
 import 'MealItem.dart';
 
-class MealWidget extends StatelessWidget {
+class MealGroup extends StatelessWidget {
   final List<MealItem> mealGrup;
   final MealGroupName groupName;
-  MealWidget(this.mealGrup, [this.groupName]);
+  MealGroup(this.mealGrup, [this.groupName]);
 
   @override
   Widget build(BuildContext context) {
