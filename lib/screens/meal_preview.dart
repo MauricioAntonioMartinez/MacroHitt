@@ -43,10 +43,11 @@ class _MealPreviewState extends State<MealPreview> {
           groupName = MealGroupName.BreakFast;
           break;
         case MealOrigin.Recipie:
-          meals = (BlocProvider.of<RecipieBloc>(context).state
-                  as RecipieLoadSuccess)
-              .recipie
-              .meals;
+          if (BlocProvider.of<RecipieBloc>(context).state is RecipieLoadSuccess)
+            meals = (BlocProvider.of<RecipieBloc>(context).state
+                    as RecipieLoadSuccess)
+                .recipie
+                .meals;
           break;
         case MealOrigin.Track:
           isTrack = true;
@@ -183,7 +184,7 @@ class _MealPreviewState extends State<MealPreview> {
             break;
         }
         Navigator.of(context).pop();
-      }),
+      }, 'Add Meal'),
     );
   }
 }

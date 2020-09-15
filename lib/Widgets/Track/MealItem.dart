@@ -18,17 +18,15 @@ class MealItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        var arguments = {
-          "meal": mealItem,
-          "groupName": groupName,
-          "origin": origin
-        };
         if (mealItem.origin == MealOrigin.Recipie)
           Navigator.of(context).pushNamed(AddRecipieWidget.routeName,
-              arguments: {"mealId": mealItem.id, "mode": RecipieMode.Add});
+              arguments: {"recipieId": mealItem.id, "mode": RecipieMode.Add});
         else
-          Navigator.of(context)
-              .pushNamed(MealPreview.routeName, arguments: arguments);
+          Navigator.of(context).pushNamed(MealPreview.routeName, arguments: {
+            "meal": mealItem,
+            "groupName": groupName,
+            "origin": origin
+          });
       },
       child: Container(
         decoration: BoxDecoration(

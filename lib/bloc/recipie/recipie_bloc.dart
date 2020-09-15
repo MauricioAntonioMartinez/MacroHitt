@@ -66,7 +66,9 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
     }
   }
 
-  Stream<RecipieState> _updateRecipieName(UpdateRecipieName event) async* {}
+  Stream<RecipieState> _updateRecipieName(UpdateRecipieName event) async* {
+    //TODO: implement updating the name in edit mode in runtime
+  }
 
   Stream<RecipieState> _deleteRecipie() async* {
     yield RecipieLoading();
@@ -117,23 +119,28 @@ class RecipieBloc extends Bloc<RecipieEvent, RecipieState> {
       final oldProtein = recipie.macrosConsumed.protein;
       final oldCarbs = recipie.macrosConsumed.carbs;
       final oldFats = recipie.macrosConsumed.fats;
-      if (recipie.meals.length < 0 && recipie.id != "") {
+      final newMeals = recipie.meals;
+      if (recipie.meals.length == 1 && recipie.id != "") {
         RecipieLoadFailure(
             'The recipie cannot be empty please, delete via the trash icon.');
         yield RecipieLoadSuccess(recipie);
       } else {
-        if (recipie.id != '') await recipieItemRepository.deleteItem(mealId);
         final removeItemIndex =
             recipie.meals.indexWhere((meal) => meal.id == mealId);
         final mealProtein = recipie.meals[removeItemIndex].protein;
         final mealCarbs = recipie.meals[removeItemIndex].carbs;
         final mealFats = recipie.meals[removeItemIndex].fats;
-        recipie.meals.removeAt(removeItemIndex);
+        final newMacros = Macro(
+            oldProtein - mealProtein, oldCarbs - mealCarbs, oldFats - mealFats);
+        if (recipie.id != '') {
+          await recipieItemRepository.deleteItem(mealId, recipie.id);
+          await recipieRepository.updateItem(recipie, newMacros);
+        }
+        newMeals.removeAt(removeItemIndex);
         final newRecipie = Recipie(
             id: recipie.id,
-            macrosConsumed: Macro(oldProtein - mealProtein,
-                oldCarbs - mealCarbs, oldFats - mealFats),
-            meals: recipie.meals,
+            macrosConsumed: newMacros,
+            meals: newMeals,
             recipeMeal: recipie.recipeMeal);
 
         yield RecipieLoadSuccess(newRecipie);
