@@ -51,6 +51,7 @@ CREATE TABLE track_meal
     meal_id TEXT NOT NULL,
     track_id TEXT NOT NULL,
     group_id TEXT NOT NULL,
+    origin TEXT NOT NULL,
     qty REAL NOT NULL,
     FOREIGN KEY
 (track_id)

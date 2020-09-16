@@ -51,10 +51,11 @@ class _MealPreviewState extends State<MealPreview> {
           break;
         case MealOrigin.Track:
           isTrack = true;
-          meals =
-              (BlocProvider.of<TrackBloc>(context).state as TrackLoadDaySuccess)
-                  .trackDay
-                  .meals[mealSelected['groupName']];
+          if (BlocProvider.of<TrackBloc>(context).state is TrackLoadDaySuccess)
+            meals = (BlocProvider.of<TrackBloc>(context).state
+                    as TrackLoadDaySuccess)
+                .trackDay
+                .meals[mealSelected['groupName']];
           groupName = mealSelected['groupName'];
           break;
       }

@@ -19,6 +19,7 @@ class Track extends Macro {
     mealsTrack.forEach((key, trackMeals) {
       finalMeals[key] = trackMeals.map((mealTrack) {
         final mealItem = userMeals.firstWhere((m) => m.id == mealTrack.id);
+        //TODO: BREAK POINT
         final qty = mealTrack.qty;
         return MealItem(
             id: mealItem.id,
@@ -80,5 +81,6 @@ class Track extends Macro {
 class MealTrack {
   final String id;
   final double qty;
-  MealTrack({this.id, this.qty});
+  final String origin;
+  MealTrack({@required this.id, @required this.qty, @required this.origin});
 }

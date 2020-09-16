@@ -24,11 +24,12 @@ class AddRecipieWidget extends StatefulWidget {
 }
 
 class _AddRecipieWidgetState extends State<AddRecipieWidget> {
-  Map<String, dynamic> _recipieName = createRecipie({'recipieName': ''});
+  Map<String, dynamic> _recipieName = createRecipie();
   final _form = GlobalKey<FormState>();
   var isInit = true;
   var recipieId = '';
   var servingSize = 1.0;
+  MealGroupName oldGroupName;
   MealGroupName groupName = MealGroupName.BreakFast;
   RecipieMode mode;
 
@@ -40,9 +41,12 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
       final args =
           ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
       mode = args['mode'];
+      final _oldGroupName = args['groupName'];
+      groupName =
+          _oldGroupName != null ? _oldGroupName : MealGroupName.BreakFast;
+      oldGroupName = _oldGroupName;
       BlocProvider.of<RecipieBloc>(context)
           .add(LoadRecipieMeals(args['recipieId']));
-      _recipieName = createRecipie({'recipieName': ''});
     }
   }
 
@@ -62,7 +66,8 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
   }
 
   Widget _createInputs(String text, Recipie recipie) {
-    _recipieName['initialValue'] = recipie.recipeMeal;
+    _recipieName['initialValue'] =
+        recipie.recipeMeal != null ? recipie.recipeMeal : '';
     return buildExpanend(
         Text(text),
         Form(
@@ -229,16 +234,7 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                 Navigator.of(context).pop();
               });
             }
-            if (state is RecipieDeleteSuccess) {
-              Navigator.of(context).pop();
-            }
-            if (state is RecipieLoadFailure) {
-              Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text(
-                    'The recipie cannot be empty please, delete via the trash icon.'),
-                backgroundColor: Theme.of(context).errorColor,
-              ));
-            }
+            if (state is RecipieDeleteSuccess) Navigator.of(context).pop();
           },
           builder: (context, state) {
             if (state is RecipieLoadSuccess) {
@@ -310,9 +306,29 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                   )
                 : null,
         bottomNavigationBar: mode == RecipieMode.Add
-            ? BottomButton(() {
-                Navigator.of(context).pop();
-              }, 'Add Recipie')
+            ? BlocBuilder<RecipieBloc, RecipieState>(
+                builder: (context, state) {
+                  if (state is RecipieLoadSuccess) {
+                    final macros = state.recipie.macrosConsumed;
+                    return BottomButton(() {
+                      final recipieToAdd = MealItem(
+                          servingName: 'Serving(s)',
+                          servingSize: servingSize,
+                          carbs: servingSize * macros.carbs,
+                          protein: servingSize * macros.protein,
+                          fats: servingSize * macros.fats,
+                          mealName: state.recipie.recipeMeal,
+                          origin: MealOrigin.Recipie,
+                          id: recipieId);
+
+                      BlocProvider.of<TrackBloc>(context).add(
+                          TrackAddMeal(recipieToAdd, groupName, oldGroupName));
+                      Navigator.of(context).pop();
+                    }, 'Add Recipie');
+                  }
+                  return Text('');
+                },
+              )
             : null);
   }
 }

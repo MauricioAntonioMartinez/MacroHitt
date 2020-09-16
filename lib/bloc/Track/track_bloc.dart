@@ -46,9 +46,9 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
     try {
       final trackingDay = day.trackDay;
       final groupId = await grpToId(event.mealGroupName);
-      final trackMealItem =
-          MealTrackItem('', event.id, trackingDay.id, groupId, 1);
-      await trackItemRepository.deleteItem(event.id, trackMealItem);
+      final trackMealItem = MealTrackItem(
+          '', event.id, trackingDay.id, groupId, 1, MealOrigin.Track);
+      // await trackItemRepository.deleteItem(event.id, trackMealItem);
       final mealItem = trackingDay.meals[event.mealGroupName]
           .firstWhere((meal) => meal.id == event.id);
 
@@ -69,7 +69,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
             macrosConsumed: newMacros,
             meals: trackingDay.meals);
       } else {
-        await trackRepository.deleteItem(trackingDay.id);
+        // await trackRepository.deleteItem(trackingDay.id);
         newTracking = Track(
             id: '',
             date: trackingDay.date,
@@ -91,6 +91,11 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
 
     try {
       final newMeal = event.meal;
+      //TODO: possible two meal preview for recipie this works
+      // both could work,decide!!.
+      // if (newMeal.origin == MealOrigin.Recipie)
+      //   newMeal.setOrigin = MealOrigin.Recipie;
+      // else
       newMeal.setOrigin = MealOrigin.Track;
       final currentTrack = day.trackDay;
       final isNewTrack = currentTrack.id == '';
@@ -104,12 +109,12 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
       final newGroupId = await grpToId(event.newGroupName);
       final oldGroupId = await grpToId(event.oldGroupName);
       final trackMealItem = MealTrackItem(
-        idTrackMeal,
-        newMeal.id,
-        isNewTrack ? idTrack : currentTrack.id,
-        newGroupId,
-        newMeal.servingSize,
-      );
+          idTrackMeal,
+          newMeal.id,
+          isNewTrack ? idTrack : currentTrack.id,
+          newGroupId,
+          newMeal.servingSize,
+          newMeal.origin);
 
       //Old Data (DAY)
       final mealsTrack = dayToTrack.meals;
@@ -177,16 +182,17 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
             oldProtein - oldMealProtein + mealProtein,
             oldCarbs - oldMealCarbs + mealCarbs,
             oldFats - oldMealFats + mealFats);
-        await trackItemRepository.updateItem(trackMealItem, oldGroupId);
+
+        // await trackItemRepository.updateItem(trackMealItem, oldGroupId);
         final indexNewMeal =
             mealsTrack[newGroup].indexWhere((meal) => meal.id == newMeal.id);
         mealsTrack[newGroup][indexNewMeal] = newMeal;
       } else {
-        await trackItemRepository.addItem(trackMealItem);
+        //  await trackItemRepository.addItem(trackMealItem);
         newMacros = Macro(
             oldProtein + mealProtein, oldCarbs + mealCarbs, oldFats + mealFats);
       }
-      await trackRepository.updateItem(dayToTrack, newMacros);
+      // await trackRepository.updateItem(dayToTrack, newMacros);
 
       //  Yielding results
       final trackDay = Track(

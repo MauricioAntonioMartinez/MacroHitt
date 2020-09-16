@@ -1,17 +1,20 @@
-import 'package:sqflite/sqflite.dart';
-import '../Model/Crud.dart';
-import '../../util/track.dart';
-import 'package:intl/intl.dart';
-import '../../db/db.dart';
-import '../Model/model.dart';
-import 'package:uuid/uuid.dart';
 import 'dart:async';
+
+import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../db/db.dart';
+import '../../util/track.dart';
+import '../Model/Crud.dart';
+import '../Model/model.dart';
 
 class TrackRepository implements CRUD<Track> {
   final uuid = Uuid();
 
   Future<Track> addItem(Track track, [String id]) async {
     final database = await db();
+
     await database.insert(
       'track',
       {
@@ -42,6 +45,9 @@ class TrackRepository implements CRUD<Track> {
 
   Future<List<Track>> findItems() async {}
 
+//TODO: a part from passing the userMeals, we need to pass the recipie table
+//items, set the origin in the MealTrack class
+
   Future<Track> findItem(String stringDate, [List<MealItem> userMeals]) async {
     final date = DateTime.parse(stringDate);
     final database = await db();
@@ -61,9 +67,11 @@ class TrackRepository implements CRUD<Track> {
         MealGroupName groupName = dbGrpToGroupName(meal['groupName']);
         trackMeals[groupName] = [
           ...(trackMeals[groupName] != null ? [...trackMeals[groupName]] : []),
-          MealTrack(id: meal['meal_id'], qty: meal['qty'])
+          MealTrack(
+              id: meal['meal_id'], qty: meal['qty'], origin: meal['origin'])
         ];
       });
+      //TODO: also pass the recipies
       final meals = Track.trackMealsToItemMeals(userMeals, trackMeals);
       return Track(
           id: trackingDay['id'],

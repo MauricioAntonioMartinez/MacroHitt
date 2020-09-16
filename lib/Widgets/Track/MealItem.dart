@@ -20,7 +20,11 @@ class MealItemWidget extends StatelessWidget {
       onTap: () {
         if (mealItem.origin == MealOrigin.Recipie)
           Navigator.of(context).pushNamed(AddRecipieWidget.routeName,
-              arguments: {"recipieId": mealItem.id, "mode": RecipieMode.Add});
+              arguments: {
+                "recipieId": mealItem.id,
+                "mode": RecipieMode.Add,
+                "groupName": groupName
+              });
         else
           Navigator.of(context).pushNamed(MealPreview.routeName, arguments: {
             "meal": mealItem,

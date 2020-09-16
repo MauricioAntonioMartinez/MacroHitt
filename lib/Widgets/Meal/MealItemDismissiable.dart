@@ -10,7 +10,7 @@ class DismissiableMeal extends StatelessWidget {
     Key key,
     @required this.mealItem,
     this.groupName,
-    this.canDismiss,
+    this.canDismiss = true,
   }) : super(key: key);
   final bool canDismiss;
   final MealGroupName groupName;
