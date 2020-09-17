@@ -19,11 +19,12 @@ class Track extends Macro {
     mealsTrack.forEach((key, trackMeals) {
       finalMeals[key] = trackMeals.map((mealTrack) {
         final mealItem = userMeals.firstWhere((m) => m.id == mealTrack.id);
-        //TODO: BREAK POINT
         final qty = mealTrack.qty;
+        var origin = MealOrigin.Track;
+        if (mealTrack.origin == 'Recipie') origin = MealOrigin.Recipie;
         return MealItem(
             id: mealItem.id,
-            origin: MealOrigin.Track,
+            origin: origin,
             carbs: (mealItem.carbs * qty),
             protein: mealItem.protein * qty,
             fats: mealItem.fats * qty,

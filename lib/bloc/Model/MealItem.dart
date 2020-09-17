@@ -26,7 +26,7 @@ class MealItem extends Macro {
       @required this.protein,
       @required this.carbs,
       @required this.fats,
-      this.brandName,
+      this.brandName = "",
       @required this.servingName,
       @required this.servingSize,
       @required this.origin,

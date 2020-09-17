@@ -319,7 +319,7 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                           fats: servingSize * macros.fats,
                           mealName: state.recipie.recipeMeal,
                           origin: MealOrigin.Recipie,
-                          id: recipieId);
+                          id: state.recipie.id);
 
                       BlocProvider.of<TrackBloc>(context).add(
                           TrackAddMeal(recipieToAdd, groupName, oldGroupName));

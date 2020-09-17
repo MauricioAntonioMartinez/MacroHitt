@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../../util/track.dart';
 import '../Model/model.dart';
 import '../Repositories/index.dart';
+import '../bloc.dart';
 import '../meal/meal_bloc.dart';
 
 part 'track_event.dart';
@@ -17,12 +18,23 @@ var uuidd = Uuid();
 class TrackBloc extends Bloc<TrackEvent, TrackState> {
   final MealBloc mealBloc;
   StreamSubscription mealTrackGroupSubscription;
+  StreamSubscription recipieTrackGroupSubscription;
+  final RecipieBloc recipieBloc;
   final TrackRepository trackRepository;
   final TrackItemRepository trackItemRepository;
-  TrackBloc({this.mealBloc, this.trackRepository, this.trackItemRepository})
+  TrackBloc(
+      {@required this.mealBloc,
+      @required this.trackRepository,
+      @required this.trackItemRepository,
+      @required this.recipieBloc})
       : super(TrackLoading()) {
     mealTrackGroupSubscription = mealBloc.listen((state) {
       if (state is MealLoadSuccess) {
+        add(TrackLoadDay(DateTime.now()));
+      }
+    });
+    recipieTrackGroupSubscription = recipieBloc.listen((state) {
+      if (state is Recipies) {
         add(TrackLoadDay(DateTime.now()));
       }
     });
@@ -48,7 +60,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
       final groupId = await grpToId(event.mealGroupName);
       final trackMealItem = MealTrackItem(
           '', event.id, trackingDay.id, groupId, 1, MealOrigin.Track);
-      // await trackItemRepository.deleteItem(event.id, trackMealItem);
+      await trackItemRepository.deleteItem(event.id, trackMealItem);
       final mealItem = trackingDay.meals[event.mealGroupName]
           .firstWhere((meal) => meal.id == event.id);
 
@@ -69,7 +81,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
             macrosConsumed: newMacros,
             meals: trackingDay.meals);
       } else {
-        // await trackRepository.deleteItem(trackingDay.id);
+        await trackRepository.deleteItem(trackingDay.id);
         newTracking = Track(
             id: '',
             date: trackingDay.date,
@@ -93,10 +105,10 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
       final newMeal = event.meal;
       //TODO: possible two meal preview for recipie this works
       // both could work,decide!!.
-      // if (newMeal.origin == MealOrigin.Recipie)
-      //   newMeal.setOrigin = MealOrigin.Recipie;
-      // else
-      newMeal.setOrigin = MealOrigin.Track;
+      if (newMeal.origin == MealOrigin.Recipie)
+        newMeal.setOrigin = MealOrigin.Recipie;
+      else
+        newMeal.setOrigin = MealOrigin.Track;
       final currentTrack = day.trackDay;
       final isNewTrack = currentTrack.id == '';
       Track dayToTrack;
@@ -170,11 +182,13 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
             }).toList();
           }
         } else {
+          mealFoundInTrack = newMeal;
           mealsTrack[newGroup] = [newMeal];
         }
       }
       Macro newMacros;
       if (mealFoundInTrack != null) {
+        //TODO: CHECK THE CALORIES WHEN ADDING AND DELETING
         final oldMealCarbs = mealFoundInTrack.carbs;
         final oldMealFats = mealFoundInTrack.fats;
         final oldMealProtein = mealFoundInTrack.protein;
@@ -183,16 +197,16 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
             oldCarbs - oldMealCarbs + mealCarbs,
             oldFats - oldMealFats + mealFats);
 
-        // await trackItemRepository.updateItem(trackMealItem, oldGroupId);
+        await trackItemRepository.updateItem(trackMealItem, oldGroupId);
         final indexNewMeal =
             mealsTrack[newGroup].indexWhere((meal) => meal.id == newMeal.id);
         mealsTrack[newGroup][indexNewMeal] = newMeal;
       } else {
-        //  await trackItemRepository.addItem(trackMealItem);
+        await trackItemRepository.addItem(trackMealItem);
         newMacros = Macro(
             oldProtein + mealProtein, oldCarbs + mealCarbs, oldFats + mealFats);
       }
-      // await trackRepository.updateItem(dayToTrack, newMacros);
+      await trackRepository.updateItem(dayToTrack, newMacros);
 
       //  Yielding results
       final trackDay = Track(
@@ -209,11 +223,13 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
 
   Stream<TrackState> _mapTrackDayToState(TrackLoadDay event) async* {
     yield TrackLoading();
-    if (mealBloc.state is MealLoadSuccess) {
+    if (mealBloc.state is MealLoadSuccess && recipieBloc.state is Recipies) {
       try {
         final userMeals = (mealBloc.state as MealLoadSuccess).myMeals;
+        final recipies = (recipieBloc.state as Recipies).recipies;
+        final allMeals = [...userMeals, ...recipies];
         final track =
-            await trackRepository.findItem(event.date.toString(), userMeals);
+            await trackRepository.findItem(event.date.toString(), allMeals);
         yield TrackLoadDaySuccess(track);
       } catch (e) {
         print(e);
@@ -224,6 +240,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
   @override
   Future<void> close() {
     mealTrackGroupSubscription.cancel();
+    recipieTrackGroupSubscription.cancel();
     return super.close();
   }
 }

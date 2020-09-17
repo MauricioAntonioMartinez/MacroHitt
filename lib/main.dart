@@ -50,7 +50,8 @@ class _MyAppState extends State<MyApp> {
           create: (_) => TrackBloc(
               mealBloc: BlocProvider.of<MealBloc>(context),
               trackRepository: TrackRepository(),
-              trackItemRepository: TrackItemRepository()),
+              trackItemRepository: TrackItemRepository(),
+              recipieBloc: BlocProvider.of<RecipieBloc>(context)),
         ),
         BlocProvider<GoalBloc>(
           create: (_) => GoalBloc(goalsRepository: GoalItemRepository()),

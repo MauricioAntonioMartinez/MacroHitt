@@ -1,9 +1,10 @@
 import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
-import '../Repositories/goals-repository.dart';
+
 import '../Model/model.dart';
+import '../Repositories/goals-repository.dart';
 
 part 'goal_event.dart';
 part 'goal_state.dart';

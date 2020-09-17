@@ -45,14 +45,12 @@ class TrackRepository implements CRUD<Track> {
 
   Future<List<Track>> findItems() async {}
 
-//TODO: a part from passing the userMeals, we need to pass the recipie table
-//items, set the origin in the MealTrack class
-
   Future<Track> findItem(String stringDate, [List<MealItem> userMeals]) async {
     final date = DateTime.parse(stringDate);
     final database = await db();
     final List<Map<String, dynamic>> tracks = await database.query('track');
     final currentDay = DateFormat.yMMMd().format(date);
+
     final trackingDay = tracks.firstWhere(
         (tr) =>
             DateFormat.yMMMd().format(DateTime.parse(tr['date'])) == currentDay,
@@ -71,7 +69,6 @@ class TrackRepository implements CRUD<Track> {
               id: meal['meal_id'], qty: meal['qty'], origin: meal['origin'])
         ];
       });
-      //TODO: also pass the recipies
       final meals = Track.trackMealsToItemMeals(userMeals, trackMeals);
       return Track(
           id: trackingDay['id'],
