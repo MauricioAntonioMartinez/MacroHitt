@@ -35,7 +35,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
     });
     recipieTrackGroupSubscription = recipieBloc.listen((state) {
       if (state is Recipies) {
-        add(TrackLoadDay(DateTime.now()));
+        //add(TrackLoadDay(DateTime.now()));
       }
     });
   }
@@ -103,11 +103,9 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
 
     try {
       final newMeal = event.meal;
-      //TODO: possible two meal preview for recipie this works
-      // both could work,decide!!.
-      if (newMeal.origin == MealOrigin.Recipie)
+      if (newMeal.origin == MealOrigin.Recipie) {
         newMeal.setOrigin = MealOrigin.Recipie;
-      else
+      } else
         newMeal.setOrigin = MealOrigin.Track;
       final currentTrack = day.trackDay;
       final isNewTrack = currentTrack.id == '';
@@ -128,6 +126,11 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
           newMeal.servingSize,
           newMeal.origin);
 
+      //OLD MEAL DATA
+      var oldMealCarbs = 0.0;
+      var oldMealFats = 0.0;
+      var oldMealProtein = 0.0;
+
       //Old Data (DAY)
       final mealsTrack = dayToTrack.meals;
       var oldCarbs = dayToTrack.macrosConsumed.carbs;
@@ -135,7 +138,6 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
       var oldProtein = dayToTrack.macrosConsumed.protein;
 
       //New Meal data
-      // final newMeal = event.meal;
       final mealProtein = newMeal.protein;
       final mealCarbs = newMeal.carbs;
       final mealFats = newMeal.fats;
@@ -144,7 +146,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
 
       // Meal Item
       MealItem mealFoundInTrack;
-
+      //TODO: Refactor the code to be more optimized, get rid of code duplication
       //Replacement
       if (oldGroup == null) {
         if (mealsTrack.keys.toList().contains(newGroup)) {
@@ -157,11 +159,17 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
         } else
           mealsTrack[newGroup] = [newMeal];
       } else if (newGroup == oldGroup) {
-        final indexMeal =
-            mealsTrack[newGroup].indexWhere((m) => m.id == newMeal.id);
+        final indexMeal = mealsTrack[newGroup].indexWhere((m) {
+          return m.id == newMeal.id;
+        });
         if (indexMeal != -1) mealFoundInTrack = mealsTrack[newGroup][indexMeal];
       } else {
-        mealsTrack[oldGroup].removeWhere((m) => m.id == newMeal.id);
+        mealsTrack[oldGroup].removeWhere((m) {
+          oldMealCarbs = m.carbs;
+          oldMealFats = m.fats;
+          oldMealProtein = m.protein;
+          return m.id == newMeal.id;
+        });
 
         if (mealsTrack[oldGroup].isEmpty)
           mealsTrack.removeWhere((key, value) => key == oldGroup);
@@ -182,20 +190,19 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
             }).toList();
           }
         } else {
-          mealFoundInTrack = newMeal;
+          //mealFoundInTrack = newMeal;
           mealsTrack[newGroup] = [newMeal];
         }
       }
       Macro newMacros;
       if (mealFoundInTrack != null) {
-        //TODO: CHECK THE CALORIES WHEN ADDING AND DELETING
-        final oldMealCarbs = mealFoundInTrack.carbs;
-        final oldMealFats = mealFoundInTrack.fats;
-        final oldMealProtein = mealFoundInTrack.protein;
+        final oldMealCarbsFound = mealFoundInTrack.carbs;
+        final oldMealFatsFound = mealFoundInTrack.fats;
+        final oldMealProteinFound = mealFoundInTrack.protein;
         newMacros = Macro(
-            oldProtein - oldMealProtein + mealProtein,
-            oldCarbs - oldMealCarbs + mealCarbs,
-            oldFats - oldMealFats + mealFats);
+            oldProtein - oldMealProteinFound - oldMealProtein + mealProtein,
+            oldCarbs - oldMealCarbsFound - oldMealCarbs + mealCarbs,
+            oldFats - oldMealFatsFound - oldMealFats + mealFats);
 
         await trackItemRepository.updateItem(trackMealItem, oldGroupId);
         final indexNewMeal =
@@ -203,8 +210,14 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
         mealsTrack[newGroup][indexNewMeal] = newMeal;
       } else {
         await trackItemRepository.addItem(trackMealItem);
-        newMacros = Macro(
-            oldProtein + mealProtein, oldCarbs + mealCarbs, oldFats + mealFats);
+        if (oldMealCarbs != null) {
+          newMacros = Macro(
+              oldProtein - oldMealProtein + mealProtein,
+              oldCarbs - oldMealCarbs + mealCarbs,
+              oldFats - oldMealFats + mealFats);
+        } else
+          newMacros = Macro(oldProtein + mealProtein, oldCarbs + mealCarbs,
+              oldFats + mealFats);
       }
       await trackRepository.updateItem(dayToTrack, newMacros);
 

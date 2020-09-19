@@ -239,7 +239,7 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
           builder: (context, state) {
             if (state is RecipieLoadSuccess) {
               final meals = state.recipie.meals;
-              final macros = state.recipie.macrosConsumed;
+              final recipie = state.recipie;
 
               return SingleChildScrollView(
                   child: Column(
@@ -248,17 +248,17 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                   Divider(),
                   MacrosSlim(
                     calories: mode == RecipieMode.Edit
-                        ? macros.getCalories
-                        : macros.getCalories * servingSize,
+                        ? recipie.getTotalCalories
+                        : recipie.getTotalCalories * servingSize,
                     carbs: mode == RecipieMode.Edit
-                        ? macros.carbs
-                        : macros.carbs * servingSize,
+                        ? recipie.getCarbs
+                        : recipie.getCarbs * servingSize,
                     fats: mode == RecipieMode.Edit
-                        ? macros.fats
-                        : macros.fats * servingSize,
+                        ? recipie.getFats
+                        : recipie.getFats * servingSize,
                     protein: mode == RecipieMode.Edit
-                        ? macros.protein
-                        : macros.protein * servingSize,
+                        ? recipie.getProtein
+                        : recipie.getProtein * servingSize,
                   ),
                   Divider(),
                   ...meals
@@ -309,14 +309,14 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
             ? BlocBuilder<RecipieBloc, RecipieState>(
                 builder: (context, state) {
                   if (state is RecipieLoadSuccess) {
-                    final macros = state.recipie.macrosConsumed;
+                    final recipie = state.recipie;
                     return BottomButton(() {
                       final recipieToAdd = MealItem(
                           servingName: 'Serving(s)',
                           servingSize: servingSize,
-                          carbs: servingSize * macros.carbs,
-                          protein: servingSize * macros.protein,
-                          fats: servingSize * macros.fats,
+                          carbs: servingSize * recipie.getCarbs,
+                          protein: servingSize * recipie.getProtein,
+                          fats: servingSize * recipie.getFats,
                           mealName: state.recipie.recipeMeal,
                           origin: MealOrigin.Recipie,
                           id: state.recipie.id);

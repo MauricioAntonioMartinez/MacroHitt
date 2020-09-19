@@ -1,15 +1,12 @@
 import 'package:HIIT/bloc/Model/model.dart';
 
-import './Macro.dart';
-
 enum RecipieMode { Edit, Create, Add }
 
-class Recipie extends Macro {
+class Recipie {
   String id;
   String recipeMeal;
   List<MealItem> meals = [];
   List<RecipieItem> recipieMeals = [];
-  Macro macrosConsumed;
   double servingSize;
 
   set setRecipieMeal(String recipieName) {
@@ -28,10 +25,7 @@ class Recipie extends Macro {
       {@required this.id,
       @required this.meals,
       @required this.recipeMeal,
-      @required this.macrosConsumed,
-      this.servingSize = 1.0})
-      : super(
-            macrosConsumed.protein, macrosConsumed.carbs, macrosConsumed.fats);
+      this.servingSize = 1.0});
 
   static List<MealItem> recipieMealsToItemMeals(
       List<MealItem> userMeals, List<RecipieItem> recipieMeals) {
@@ -60,28 +54,28 @@ class Recipie extends Macro {
   }
 
   double get getTotalCalories {
-    return this.meals.fold(0, (acc, meals) => acc + 1.1);
+    return this.meals.fold(0, (acc, meal) => acc + meal.getCalories);
   }
 
   double get getProtein {
-    return this.meals.fold(0, (acc, meal) => acc + 1.1);
+    return this.meals.fold(0, (acc, meal) => acc + meal.protein);
   }
 
   double get getCarbs {
-    return this.meals.fold(0, (acc, meal) => acc + 1.1);
+    return this.meals.fold(0, (acc, meal) => acc + meal.carbs);
   }
 
   double get getFats {
-    return this.meals.toList().fold(0, (acc, meal) => acc + 1.1);
+    return this.meals.toList().fold(0, (acc, meal) => acc + meal.fats);
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'recipieMeal': recipeMeal,
-      'protein': macrosConsumed.protein,
-      'carbs': macrosConsumed.carbs,
-      'fats': macrosConsumed.fats,
+      'protein': getProtein,
+      'carbs': getCarbs,
+      'fats': getFats,
     };
   }
 }

@@ -14,17 +14,13 @@ class RecipieRepository {
       {
         'id': recipie.id,
         'recipieName': recipie.recipeMeal,
-        'protein': recipie.protein,
-        'carbs': recipie.carbs,
-        'fats': recipie.fats,
+        'protein': recipie.getProtein,
+        'carbs': recipie.getCarbs,
+        'fats': recipie.getFats,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    return Recipie(
-        id: recipie.id,
-        recipeMeal: recipie.recipeMeal,
-        macrosConsumed: Macro(0, 0, 0),
-        meals: []);
+    return Recipie(id: recipie.id, recipeMeal: recipie.recipeMeal, meals: []);
   }
 
   Future<void> deleteItem(String recipieId) async {
@@ -69,17 +65,14 @@ class RecipieRepository {
 
   Future<Recipie> findItem(String recipieId, [List<MealItem> userMeals]) async {
     if (recipieId == null) {
-      return Recipie(
-          id: '', recipeMeal: '', macrosConsumed: Macro(0, 0, 0), meals: []);
+      return Recipie(id: '', recipeMeal: '', meals: []);
     }
 
     final database = await db();
     final recipie =
         await database.query('recipie', where: "id=?", whereArgs: [recipieId]);
 
-    if (recipie.length < 1)
-      return Recipie(
-          id: '', recipeMeal: '', macrosConsumed: Macro(0, 0, 0), meals: []);
+    if (recipie.length < 1) return Recipie(id: '', recipeMeal: '', meals: []);
 
     final List<Map<String, dynamic>> mealsRecipie = await database
         .query('recipie_meal', where: "recipie_id=?", whereArgs: [recipieId]);
@@ -92,14 +85,8 @@ class RecipieRepository {
           recipieId: meal['recipie_id']));
     });
     final recipieName = recipie[0]['recipieName'];
-    final protein = recipie[0]['protein'];
-    final carbs = recipie[0]['carbs'];
-    final fats = recipie[0]['fats'];
+
     final meals = Recipie.recipieMealsToItemMeals(userMeals, recipieMeals);
-    return Recipie(
-        id: recipieId,
-        recipeMeal: recipieName,
-        meals: meals,
-        macrosConsumed: Macro(protein, carbs, fats));
+    return Recipie(id: recipieId, recipeMeal: recipieName, meals: meals);
   }
 }
