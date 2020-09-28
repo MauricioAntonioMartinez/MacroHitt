@@ -7,15 +7,16 @@ import '../../screens/EditMeal.dart';
 import '../UI/bottomModalSheet.dart';
 
 class PreviewActions extends StatelessWidget {
-  const PreviewActions(
-      {Key key,
-      @required this.origin,
-      @required this.groupName,
-      @required this.meal,
-      @required this.isTrack,
-      @required this.onChangeGroupName})
-      : super(key: key);
-
+  const PreviewActions({
+    Key key,
+    @required this.origin,
+    @required this.groupName,
+    @required this.meal,
+    @required this.isTrack,
+    @required this.onChangeGroupName,
+    @required this.didUpdate,
+  }) : super(key: key);
+  final Function didUpdate;
   final MealOrigin origin;
   final MealGroupName groupName;
   final MealItem meal;
@@ -28,7 +29,7 @@ class PreviewActions extends StatelessWidget {
       height: 30,
       child: Row(
         children: <Widget>[
-          if (origin != MealOrigin.Recipie)
+          if (origin != MealOrigin.Recipe)
             Expanded(
                 child: GestureDetector(
               onTap: onChangeGroupName,
@@ -63,7 +64,12 @@ class PreviewActions extends StatelessWidget {
                         cb: (value) {
                           if (value == ' .Edit Meal') {
                             Navigator.of(context)
-                                .pushNamed(EditMeal.routeName, arguments: meal);
+                                .pushNamed(EditMeal.routeName, arguments: meal)
+                                .then((mealIsUpdate) {
+                              if (mealIsUpdate != null) {
+                                didUpdate(mealIsUpdate);
+                              }
+                            });
                           } else {
                             showDialog(
                                 context: context,
@@ -110,7 +116,7 @@ class PreviewActions extends StatelessWidget {
             ],
           )
         ],
-        mainAxisAlignment: origin != MealOrigin.Recipie
+        mainAxisAlignment: origin != MealOrigin.Recipe
             ? MainAxisAlignment.spaceEvenly
             : MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,

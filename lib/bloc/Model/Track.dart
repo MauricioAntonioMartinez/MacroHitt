@@ -21,7 +21,7 @@ class Track extends Macro {
         final mealItem = userMeals.firstWhere((m) => m.id == mealTrack.id);
         final qty = mealTrack.qty;
         var origin = MealOrigin.Track;
-        if (mealTrack.origin == 'Recipie') origin = MealOrigin.Recipie;
+        if (mealTrack.origin == 'Recipe') origin = MealOrigin.Recipe;
         return MealItem(
             id: mealItem.id,
             origin: origin,

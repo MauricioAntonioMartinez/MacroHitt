@@ -4,8 +4,9 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:uuid/uuid.dart';
-import '../Repositories/index.dart';
+
 import '../Model/model.dart';
+import '../Repositories/index.dart';
 
 part 'meal_event.dart';
 part 'meal_state.dart';
@@ -60,6 +61,7 @@ class MealBloc extends Bloc<MealEvent, MealState> {
     yield MealLoading();
     try {
       final meal = await mealItemRepository.addItem(event.mealItem);
+      meal.setOrigin = MealOrigin.Search;
       oldMeals.add(meal);
       yield MealLoadSuccess(oldMeals);
     } catch (_) {

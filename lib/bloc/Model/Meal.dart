@@ -1,5 +1,3 @@
-import './model.dart';
-
 class MealTrack {
   final String id;
   final double qty;

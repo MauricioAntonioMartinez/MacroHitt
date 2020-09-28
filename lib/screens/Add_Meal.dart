@@ -17,17 +17,22 @@ class _AddMealState extends State<AddMeal> {
   List<Map<String, dynamic>> _macros = [{}];
   List<Map<String, dynamic>> _details = [{}];
   var _isEditMode = false;
+  var isInit = true;
   Map<String, dynamic> newMeal = {};
   final _form = GlobalKey<FormState>();
+  MealItem mealSelected;
 
   @override
   void initState() {
     super.initState();
-    _mealInfo = mealInfo(widget.mealFields);
-    _macros = macros(widget.mealFields);
-    _details = details(widget.mealFields);
-    _isEditMode = (widget.mealFields.keys.length != 0);
-    newMeal = widget.mealFields;
+    if (isInit) {
+      isInit = false;
+      _mealInfo = mealInfo(widget.mealFields);
+      _macros = macros(widget.mealFields);
+      _details = details(widget.mealFields);
+      _isEditMode = (widget.mealFields.keys.length != 0);
+      newMeal = widget.mealFields;
+    }
   }
 
   double convertDouble(dynamic value) => value is double
@@ -40,7 +45,7 @@ class _AddMealState extends State<AddMeal> {
     if (isValid) {
       _form.currentState.save();
       final servingSize = convertDouble(newMeal['servingSize']);
-      final thisMeal = MealItem(
+      mealSelected = MealItem(
         id: newMeal['id'],
         origin: newMeal['origin'],
         mealName: newMeal['mealName'],
@@ -63,15 +68,12 @@ class _AddMealState extends State<AddMeal> {
         servingSize: 1,
       );
 
-      if (_isEditMode) {
-        print(_isEditMode);
-        BlocProvider.of<MealBloc>(context).add(MealEdit(thisMeal));
-      } else {
-        BlocProvider.of<MealBloc>(context).add(MealAdd(thisMeal));
+      if (_isEditMode)
+        BlocProvider.of<MealBloc>(context).add(MealEdit(mealSelected));
+      else {
+        BlocProvider.of<MealBloc>(context).add(MealAdd(mealSelected));
         _form.currentState.reset();
       }
-
-      //Navigator.of(context).pop();
     }
   }
 
@@ -139,11 +141,10 @@ class _AddMealState extends State<AddMeal> {
         child: BlocConsumer<MealBloc, MealState>(
           listener: (context, state) {
             if (state is MealLoadSuccess) {
+              if (_isEditMode) return Navigator.of(context).pop(mealSelected);
               Scaffold.of(context).showSnackBar(SnackBar(
                 backgroundColor: Theme.of(context).primaryColor,
-                content: Text(_isEditMode
-                    ? 'Successfully Updated'
-                    : 'Successfully Added'),
+                content: Text('Successfully Added'),
               ));
             }
           },

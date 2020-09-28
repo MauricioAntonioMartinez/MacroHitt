@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../bloc/Model/model.dart';
-import '../screens/Add_Recipie.dart';
+import '../screens/Add_Recipe.dart';
 import '../screens/search.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -12,9 +12,9 @@ class MainDrawer extends StatelessWidget {
     {'nav': 'Add Goal', 'index': 0},
     {'nav': 'Search Meal', 'routeName': Search.routeName},
     {
-      'nav': 'Add Recipie',
-      'routeName': AddRecipieWidget.routeName,
-      "arguments": {"mode": RecipieMode.Create}
+      'nav': 'Add Recipe',
+      'routeName': AddRecipeWidget.routeName,
+      "arguments": {"mode": RecipeMode.Create}
     },
   ];
   MainDrawer(this.navAction);

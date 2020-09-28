@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../bloc/Model/model.dart';
-import '../../screens/Add_Recipie.dart';
+import '../../screens/Add_Recipe.dart';
 import '../../screens/meal_preview.dart';
 import '../Meal/MealItemDismissiable.dart';
 import '../MealInformation/MealItemSlimDetails.dart';
@@ -18,13 +18,14 @@ class MealItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (mealItem.origin == MealOrigin.Recipie)
-          Navigator.of(context).pushNamed(AddRecipieWidget.routeName,
-              arguments: {
-                "recipieId": mealItem.id,
-                "mode": RecipieMode.Add,
-                "groupName": groupName
-              });
+        if (mealItem.origin == MealOrigin.Recipe)
+          Navigator.of(context)
+              .pushNamed(AddRecipeWidget.routeName, arguments: {
+            "recipeId": mealItem.id,
+            "mode": RecipeMode.Add,
+            "groupName": groupName,
+            'servingSize': mealItem.servingSize
+          });
         else
           Navigator.of(context).pushNamed(MealPreview.routeName, arguments: {
             "meal": mealItem,

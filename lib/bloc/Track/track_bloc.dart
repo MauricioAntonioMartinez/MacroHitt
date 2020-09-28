@@ -18,24 +18,27 @@ var uuidd = Uuid();
 class TrackBloc extends Bloc<TrackEvent, TrackState> {
   final MealBloc mealBloc;
   StreamSubscription mealTrackGroupSubscription;
-  StreamSubscription recipieTrackGroupSubscription;
-  final RecipieBloc recipieBloc;
+  StreamSubscription reciperackGroupSubscription;
+  final RecipeBloc recipeBloc;
   final TrackRepository trackRepository;
   final TrackItemRepository trackItemRepository;
   TrackBloc(
       {@required this.mealBloc,
       @required this.trackRepository,
       @required this.trackItemRepository,
-      @required this.recipieBloc})
+      @required this.recipeBloc})
       : super(TrackLoading()) {
     mealTrackGroupSubscription = mealBloc.listen((state) {
       if (state is MealLoadSuccess) {
         add(TrackLoadDay(DateTime.now()));
       }
     });
-    recipieTrackGroupSubscription = recipieBloc.listen((state) {
-      if (state is Recipies) {
-        //add(TrackLoadDay(DateTime.now()));
+    reciperackGroupSubscription = recipeBloc.listen((state) {
+      if (state is AddEditMealRecipe ||
+          state is DeleteMealRecipe ||
+          state is DeleteRecipe ||
+          state is UpdateRecipeName) {
+        add(TrackLoadDay(DateTime.now()));
       }
     });
   }
@@ -76,7 +79,9 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
             trackingDay.macrosConsumed.protein - mealItem.protein,
             trackingDay.macrosConsumed.carbs - mealItem.carbs,
             trackingDay.macrosConsumed.fats - mealItem.fats);
+        await trackRepository.updateItem(day.trackDay, newMacros);
         newTracking = Track(
+            id: trackingDay.id,
             date: trackingDay.date,
             macrosConsumed: newMacros,
             meals: trackingDay.meals);
@@ -103,8 +108,8 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
 
     try {
       final newMeal = event.meal;
-      if (newMeal.origin == MealOrigin.Recipie) {
-        newMeal.setOrigin = MealOrigin.Recipie;
+      if (newMeal.origin == MealOrigin.Recipe) {
+        newMeal.setOrigin = MealOrigin.Recipe;
       } else
         newMeal.setOrigin = MealOrigin.Track;
       final currentTrack = day.trackDay;
@@ -127,6 +132,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
           newMeal.origin);
 
       //OLD MEAL DATA
+      var isGroupChange = false;
       var oldMealCarbs = 0.0;
       var oldMealFats = 0.0;
       var oldMealProtein = 0.0;
@@ -162,13 +168,19 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
         final indexMeal = mealsTrack[newGroup].indexWhere((m) {
           return m.id == newMeal.id;
         });
-        if (indexMeal != -1) mealFoundInTrack = mealsTrack[newGroup][indexMeal];
+        if (indexMeal != -1) {
+          mealFoundInTrack = mealsTrack[newGroup][indexMeal];
+        }
       } else {
+        isGroupChange = true;
         mealsTrack[oldGroup].removeWhere((m) {
-          oldMealCarbs = m.carbs;
-          oldMealFats = m.fats;
-          oldMealProtein = m.protein;
-          return m.id == newMeal.id;
+          if (m.id == newMeal.id) {
+            oldMealCarbs = m.carbs;
+            oldMealFats = m.fats;
+            oldMealProtein = m.protein;
+            return true;
+          } else
+            return false;
         });
 
         if (mealsTrack[oldGroup].isEmpty)
@@ -203,21 +215,24 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
             oldProtein - oldMealProteinFound - oldMealProtein + mealProtein,
             oldCarbs - oldMealCarbsFound - oldMealCarbs + mealCarbs,
             oldFats - oldMealFatsFound - oldMealFats + mealFats);
-
-        await trackItemRepository.updateItem(trackMealItem, oldGroupId);
+        //TODO: BAD UPDATE IN THE DB WHEN CHANGING MEALS
+        await trackItemRepository.updateItem(
+            trackMealItem, oldGroupId == null ? newGroupId : oldGroupId);
         final indexNewMeal =
             mealsTrack[newGroup].indexWhere((meal) => meal.id == newMeal.id);
         mealsTrack[newGroup][indexNewMeal] = newMeal;
       } else {
-        await trackItemRepository.addItem(trackMealItem);
-        if (oldMealCarbs != null) {
+        if (isGroupChange) {
+          await trackItemRepository.updateItem(trackMealItem, oldGroupId);
           newMacros = Macro(
               oldProtein - oldMealProtein + mealProtein,
               oldCarbs - oldMealCarbs + mealCarbs,
               oldFats - oldMealFats + mealFats);
-        } else
+        } else {
+          await trackItemRepository.addItem(trackMealItem);
           newMacros = Macro(oldProtein + mealProtein, oldCarbs + mealCarbs,
               oldFats + mealFats);
+        }
       }
       await trackRepository.updateItem(dayToTrack, newMacros);
 
@@ -236,24 +251,24 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
 
   Stream<TrackState> _mapTrackDayToState(TrackLoadDay event) async* {
     yield TrackLoading();
-    if (mealBloc.state is MealLoadSuccess && recipieBloc.state is Recipies) {
-      try {
-        final userMeals = (mealBloc.state as MealLoadSuccess).myMeals;
-        final recipies = (recipieBloc.state as Recipies).recipies;
-        final allMeals = [...userMeals, ...recipies];
-        final track =
-            await trackRepository.findItem(event.date.toString(), allMeals);
-        yield TrackLoadDaySuccess(track);
-      } catch (e) {
-        print(e);
-      }
+    // if (mealBloc.state is MealLoadSuccess && recipeBloc.state is Recipe) {
+    try {
+      final userMeals = (mealBloc.state as MealLoadSuccess).myMeals;
+      final recipe = (recipeBloc.state as Recipes).recipes;
+      final allMeals = [...userMeals, ...recipe];
+      final track =
+          await trackRepository.findItem(event.date.toString(), allMeals);
+      yield TrackLoadDaySuccess(track);
+    } catch (e) {
+      print(e);
     }
+    //   }
   }
 
   @override
   Future<void> close() {
     mealTrackGroupSubscription.cancel();
-    recipieTrackGroupSubscription.cancel();
+    reciperackGroupSubscription.cancel();
     return super.close();
   }
 }

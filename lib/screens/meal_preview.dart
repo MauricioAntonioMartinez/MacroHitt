@@ -30,6 +30,7 @@ class _MealPreviewState extends State<MealPreview> {
 
   @override
   void didChangeDependencies() {
+    print('DEPENDENCIES');
     super.didChangeDependencies();
     if (!isDeleted) {
       mealSelected = ModalRoute.of(context).settings.arguments;
@@ -42,11 +43,11 @@ class _MealPreviewState extends State<MealPreview> {
               .myMeals;
           groupName = MealGroupName.BreakFast;
           break;
-        case MealOrigin.Recipie:
-          if (BlocProvider.of<RecipieBloc>(context).state is RecipieLoadSuccess)
-            meals = (BlocProvider.of<RecipieBloc>(context).state
-                    as RecipieLoadSuccess)
-                .recipie
+        case MealOrigin.Recipe:
+          if (BlocProvider.of<RecipeBloc>(context).state is RecipeLoadSuccess)
+            meals = (BlocProvider.of<RecipeBloc>(context).state
+                    as RecipeLoadSuccess)
+                .recipe
                 .meals;
           break;
         case MealOrigin.Track:
@@ -112,7 +113,13 @@ class _MealPreviewState extends State<MealPreview> {
                         origin: origin,
                         groupName: groupName,
                         meal: meal,
-                        isTrack: isTrack),
+                        isTrack: isTrack,
+                        didUpdate: (MealItem mealUpdated) {
+                          setState(() {
+                            mealUpdated.setOrigin = meal.origin;
+                            meal = mealUpdated;
+                          });
+                        }),
                     Divider(),
                     buildExpanend(
                         Column(
@@ -121,7 +128,7 @@ class _MealPreviewState extends State<MealPreview> {
                           children: <Widget>[
                             Container(
                               padding: EdgeInsets.all(5),
-                              child: Text('Recipie',
+                              child: Text('Recipe',
                                   style: TextStyle(
                                     color: Colors.black45,
                                   )),
@@ -174,8 +181,8 @@ class _MealPreviewState extends State<MealPreview> {
             ),
       bottomNavigationBar: BottomButton(() {
         switch (origin) {
-          case MealOrigin.Recipie:
-            BlocProvider.of<RecipieBloc>(context).add(AddEditMealRecipie(meal));
+          case MealOrigin.Recipe:
+            BlocProvider.of<RecipeBloc>(context).add(AddEditMealRecipe(meal));
             break;
           case MealOrigin.Track:
             BlocProvider.of<TrackBloc>(context)

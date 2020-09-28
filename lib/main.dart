@@ -1,6 +1,6 @@
 import 'package:HIIT/bloc/Repositories/goals-repository.dart';
-import 'package:HIIT/bloc/Repositories/recipie-item-repository.dart';
-import 'package:HIIT/bloc/Repositories/recipie-repository.dart';
+import 'package:HIIT/bloc/Repositories/recipe-item-repository.dart';
+import 'package:HIIT/bloc/Repositories/recipe-repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -17,12 +17,12 @@ void main() {
         return MealBloc(mealItemRepository: MealItemRepository())
           ..add(MealLoad());
       },
-      child: BlocProvider<RecipieBloc>(
-        create: (context) => RecipieBloc(
+      child: BlocProvider<RecipeBloc>(
+        create: (context) => RecipeBloc(
           mealBloc: BlocProvider.of<MealBloc>(context),
-          recipieItemRepository: RecipieItemRepository(),
-          recipieRepository: RecipieRepository(),
-        )..add(LoadRecipies()),
+          recipeItemRepository: RecipeItemRepository(),
+          recipeRepository: RecipeRepository(),
+        )..add(LoadRecipes()),
         child: MyApp(),
       )));
 }
@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     Future.delayed(Duration(seconds: 1)).then((value) {
-      BlocProvider.of<RecipieBloc>(context).add(LoadRecipies());
+      BlocProvider.of<RecipeBloc>(context).add(LoadRecipes());
     });
   }
 
@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> {
               mealBloc: BlocProvider.of<MealBloc>(context),
               trackRepository: TrackRepository(),
               trackItemRepository: TrackItemRepository(),
-              recipieBloc: BlocProvider.of<RecipieBloc>(context)),
+              recipeBloc: BlocProvider.of<RecipeBloc>(context)),
         ),
         BlocProvider<GoalBloc>(
           create: (_) => GoalBloc(goalsRepository: GoalItemRepository()),
@@ -90,7 +90,7 @@ class _MyAppState extends State<MyApp> {
           MealPreview.routeName: (ctx) => MealPreview(),
           EditMeal.routeName: (ctx) => EditMeal(),
           AddGoalWidget.routName: (ctx) => AddGoalWidget(),
-          AddRecipieWidget.routeName: (ctx) => AddRecipieWidget()
+          AddRecipeWidget.routeName: (ctx) => AddRecipeWidget()
         },
         onGenerateRoute: (settings) {
           print(settings);

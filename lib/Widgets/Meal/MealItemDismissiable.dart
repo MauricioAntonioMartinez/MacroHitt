@@ -49,7 +49,7 @@ class DismissiableMeal extends StatelessWidget {
                   )).then((isDeleted) {
             if (!canDismiss) {
               Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text('The recipie cannot be empty !!'),
+                content: Text('The recipe cannot be empty !!'),
                 backgroundColor: Theme.of(context).errorColor,
               ));
               return false;
@@ -62,8 +62,8 @@ class DismissiableMeal extends StatelessWidget {
             BlocProvider.of<TrackBloc>(context)
                 .add(TrackRemoveMeal(mealItem.id, groupName));
           } else {
-            BlocProvider.of<RecipieBloc>(context)
-                .add(DeleteMealRecipie(mealItem.id));
+            BlocProvider.of<RecipeBloc>(context)
+                .add(DeleteMealRecipe(mealItem.id));
           }
         },
         dismissThresholds: dismissThresholds,

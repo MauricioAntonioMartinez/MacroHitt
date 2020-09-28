@@ -3,7 +3,7 @@ import 'package:HIIT/Widgets/MealInformation/MacrosSlim.dart';
 import 'package:HIIT/Widgets/MealInformation/MealItemSlimDetails.dart';
 import 'package:HIIT/bloc/Model/MealItem.dart';
 import 'package:HIIT/bloc/bloc.dart';
-import 'package:HIIT/inputs/add-recipie.dart';
+import 'package:HIIT/inputs/add-recipe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,22 +16,22 @@ import '../bloc/Model/model.dart';
 import '../screens/meal_preview.dart';
 import '../screens/search.dart';
 
-class AddRecipieWidget extends StatefulWidget {
-  static const routeName = '/add-recipie';
+class AddRecipeWidget extends StatefulWidget {
+  static const routeName = '/add-recipe';
 
   @override
-  _AddRecipieWidgetState createState() => _AddRecipieWidgetState();
+  _AddRecipeWidgetState createState() => _AddRecipeWidgetState();
 }
 
-class _AddRecipieWidgetState extends State<AddRecipieWidget> {
-  Map<String, dynamic> _recipieName = createRecipie();
+class _AddRecipeWidgetState extends State<AddRecipeWidget> {
+  Map<String, dynamic> _recipeName = createRecipe();
   final _form = GlobalKey<FormState>();
   var isInit = true;
-  var recipieId = '';
+  var recipeId = '';
   var servingSize = 1.0;
   MealGroupName oldGroupName;
   MealGroupName groupName = MealGroupName.BreakFast;
-  RecipieMode mode;
+  RecipeMode mode;
 
   @override
   void didChangeDependencies() {
@@ -41,12 +41,15 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
       final args =
           ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
       mode = args['mode'];
+
+      servingSize = args['servingSize'] == null ? 1.0 : args['servingSize'];
+
       final _oldGroupName = args['groupName'];
       groupName =
           _oldGroupName != null ? _oldGroupName : MealGroupName.BreakFast;
       oldGroupName = _oldGroupName;
-      BlocProvider.of<RecipieBloc>(context)
-          .add(LoadRecipieMeals(args['recipieId']));
+      BlocProvider.of<RecipeBloc>(context)
+          .add(LoadRecipeMeals(args['recipeId']));
     }
   }
 
@@ -54,36 +57,35 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
     final isValid = _form.currentState.validate();
     if (isValid) {
       _form.currentState.save();
-      BlocProvider.of<RecipieBloc>(context)
-          .add(SaveRecipie(_recipieName['value']));
+      BlocProvider.of<RecipeBloc>(context)
+          .add(SaveRecipe(_recipeName['value']));
     }
   }
 
   @override
   void deactivate() {
-    BlocProvider.of<RecipieBloc>(context).add(LoadRecipies());
+    BlocProvider.of<RecipeBloc>(context).add(LoadRecipes());
     super.deactivate();
   }
 
-  Widget _createInputs(String text, Recipie recipie) {
-    _recipieName['initialValue'] =
-        recipie.recipeMeal != null ? recipie.recipeMeal : '';
+  Widget _createInputs(String text, Recipe recipe) {
+    _recipeName['initialValue'] =
+        recipe.recipeMeal != null ? recipe.recipeMeal : '';
     return buildExpanend(
         Text(text),
         Form(
           key: _form,
           child: CustomTextField(
             isEditMode: true,
-            props: _recipieName,
+            props: _recipeName,
             onChange: (val) {
               setState(() {
-                _recipieName['value'] = val;
+                _recipeName['value'] = val;
               });
             },
             onSubmited: (val) {
-              if (mode == RecipieMode.Edit && val != '')
-                BlocProvider.of<RecipieBloc>(context)
-                    .add(UpdateRecipieName(val));
+              if (mode == RecipeMode.Edit && val != '')
+                BlocProvider.of<RecipeBloc>(context).add(UpdateRecipeName(val));
             },
           ),
         ),
@@ -100,7 +102,7 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
         context: context);
   }
 
-  Widget _addInputs(Recipie recipie) {
+  Widget _addInputs(Recipe recipe) {
     return buildExpanend(
         Expanded(
             child: GestureDetector(
@@ -140,20 +142,20 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
         20);
   }
 
-  List<Widget> _buildInputs(RecipieLoadSuccess state) {
+  List<Widget> _buildInputs(RecipeLoadSuccess state) {
     var text = "";
-    final recipie = state.recipie;
-    Widget inputs = _createInputs(text, recipie);
+    final recipe = state.recipe;
+    Widget inputs = _createInputs(text, recipe);
     switch (mode) {
-      case RecipieMode.Add:
-        text = "Track the recipie";
-        inputs = _addInputs(recipie);
+      case RecipeMode.Add:
+        text = recipe.recipeMeal;
+        inputs = _addInputs(recipe);
         break;
-      case RecipieMode.Create:
-        text = "Name your Recipie";
+      case RecipeMode.Create:
+        text = "Name your Recipe";
         break;
-      case RecipieMode.Edit:
-        text = "Edit your Recipie";
+      case RecipeMode.Edit:
+        text = "Edit your Recipe";
         break;
     }
     return [Header(text), inputs];
@@ -163,37 +165,34 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(mode == RecipieMode.Add
-              ? 'Add your recipie'
-              : mode == RecipieMode.Create
-                  ? "Create your recipie"
-                  : "Edit Recipie"),
+          title: Text(mode == RecipeMode.Add
+              ? 'Add your recipe'
+              : mode == RecipeMode.Create
+                  ? "Create your recipe"
+                  : "Edit Recipe"),
           actions: <Widget>[
             IconButton(
-                icon: Icon(
-                    mode == RecipieMode.Create ? Icons.save : Icons.delete),
+                icon:
+                    Icon(mode == RecipeMode.Create ? Icons.save : Icons.delete),
                 color: Colors.white,
                 iconSize: 35,
                 enableFeedback: true,
                 onPressed: () {
-                  if (mode == RecipieMode.Create)
+                  if (mode == RecipeMode.Create)
                     saveForm();
                   else
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
                               title: Text(
-                                  'Do you really want to remove this recipie?',
+                                  'Do you really want to remove this recipe?',
                                   style: Theme.of(context).textTheme.subtitle),
                               actions: <Widget>[
-                                BlocListener<TrackBloc, TrackState>(
-                                  listener: (context, state) {},
-                                  child: FlatButton(
-                                    child: Text('Yes'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop(true);
-                                    },
-                                  ),
+                                FlatButton(
+                                  child: Text('Yes'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(true);
+                                  },
                                 ),
                                 FlatButton(
                                   child: Text('No',
@@ -205,41 +204,41 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                               ],
                             )).then((isDeleted) {
                       if (isDeleted)
-                        BlocProvider.of<RecipieBloc>(context)
-                            .add(DeleteRecipie(recipieId));
+                        BlocProvider.of<RecipeBloc>(context)
+                            .add(DeleteRecipe(recipeId));
                     });
                 }),
-            if (mode == RecipieMode.Edit || mode == RecipieMode.Add)
+            if (mode == RecipeMode.Edit || mode == RecipeMode.Add)
               IconButton(
                   icon:
-                      Icon(mode == RecipieMode.Edit ? Icons.clear : Icons.edit),
+                      Icon(mode == RecipeMode.Edit ? Icons.clear : Icons.edit),
                   onPressed: () {
                     setState(() {
-                      mode = mode == RecipieMode.Edit
-                          ? RecipieMode.Add
-                          : RecipieMode.Edit;
+                      mode = mode == RecipeMode.Edit
+                          ? RecipeMode.Add
+                          : RecipeMode.Edit;
                     });
                   })
           ],
         ),
-        body: BlocConsumer<RecipieBloc, RecipieState>(
+        body: BlocConsumer<RecipeBloc, RecipeState>(
           listener: (context, state) {
-            if (state is RecipieSavedSuccess) {
+            if (state is RecipeSavedSuccess) {
               Scaffold.of(context).showSnackBar(SnackBar(
                 content: Text('Saved Successfully'),
                 backgroundColor: Theme.of(context).primaryColor,
               ));
-              BlocProvider.of<RecipieBloc>(context).add(LoadRecipies());
+              BlocProvider.of<RecipeBloc>(context).add(LoadRecipes());
               Future.delayed(Duration(seconds: 1)).then((_) {
                 Navigator.of(context).pop();
               });
             }
-            if (state is RecipieDeleteSuccess) Navigator.of(context).pop();
+            if (state is RecipeDeleteSuccess) Navigator.of(context).pop();
           },
           builder: (context, state) {
-            if (state is RecipieLoadSuccess) {
-              final meals = state.recipie.meals;
-              final recipie = state.recipie;
+            if (state is RecipeLoadSuccess) {
+              final meals = state.recipe.meals;
+              final recipe = state.recipe;
 
               return SingleChildScrollView(
                   child: Column(
@@ -247,29 +246,29 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                   ..._buildInputs(state),
                   Divider(),
                   MacrosSlim(
-                    calories: mode == RecipieMode.Edit
-                        ? recipie.getTotalCalories
-                        : recipie.getTotalCalories * servingSize,
-                    carbs: mode == RecipieMode.Edit
-                        ? recipie.getCarbs
-                        : recipie.getCarbs * servingSize,
-                    fats: mode == RecipieMode.Edit
-                        ? recipie.getFats
-                        : recipie.getFats * servingSize,
-                    protein: mode == RecipieMode.Edit
-                        ? recipie.getProtein
-                        : recipie.getProtein * servingSize,
+                    calories: mode == RecipeMode.Edit
+                        ? recipe.getTotalCalories
+                        : recipe.getTotalCalories * servingSize,
+                    carbs: mode == RecipeMode.Edit
+                        ? recipe.getCarbs
+                        : recipe.getCarbs * servingSize,
+                    fats: mode == RecipeMode.Edit
+                        ? recipe.getFats
+                        : recipe.getFats * servingSize,
+                    protein: mode == RecipeMode.Edit
+                        ? recipe.getProtein
+                        : recipe.getProtein * servingSize,
                   ),
                   Divider(),
                   ...meals
-                      .map((e) => mode == RecipieMode.Edit
+                      .map((e) => mode == RecipeMode.Edit
                           ? GestureDetector(
                               onTap: () {
                                 Navigator.of(context).pushNamed(
                                     MealPreview.routeName,
                                     arguments: {
                                       "meal": e,
-                                      "origin": MealOrigin.Recipie
+                                      "origin": MealOrigin.Recipe
                                     });
                               },
                               child: DismissiableMeal(
@@ -291,7 +290,7 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
           },
         ),
         floatingActionButton:
-            mode == RecipieMode.Create || mode == RecipieMode.Edit
+            mode == RecipeMode.Create || mode == RecipeMode.Edit
                 ? Card(
                     shape: CircleBorder(
                         side: BorderSide(width: 0.5, color: Colors.black54)),
@@ -301,30 +300,30 @@ class _AddRecipieWidgetState extends State<AddRecipieWidget> {
                         color: Theme.of(context).primaryColor,
                         onPressed: () {
                           Navigator.of(context).pushNamed(Search.routeName,
-                              arguments: MealOrigin.Recipie);
+                              arguments: MealOrigin.Recipe);
                         }),
                   )
                 : null,
-        bottomNavigationBar: mode == RecipieMode.Add
-            ? BlocBuilder<RecipieBloc, RecipieState>(
+        bottomNavigationBar: mode == RecipeMode.Add
+            ? BlocBuilder<RecipeBloc, RecipeState>(
                 builder: (context, state) {
-                  if (state is RecipieLoadSuccess) {
-                    final recipie = state.recipie;
+                  if (state is RecipeLoadSuccess) {
+                    final recipe = state.recipe;
                     return BottomButton(() {
-                      final recipieToAdd = MealItem(
+                      final recipeToAdd = MealItem(
                           servingName: 'Serving(s)',
                           servingSize: servingSize,
-                          carbs: servingSize * recipie.getCarbs,
-                          protein: servingSize * recipie.getProtein,
-                          fats: servingSize * recipie.getFats,
-                          mealName: state.recipie.recipeMeal,
-                          origin: MealOrigin.Recipie,
-                          id: state.recipie.id);
+                          carbs: servingSize * recipe.getCarbs,
+                          protein: servingSize * recipe.getProtein,
+                          fats: servingSize * recipe.getFats,
+                          mealName: state.recipe.recipeMeal,
+                          origin: MealOrigin.Recipe,
+                          id: state.recipe.id);
 
                       BlocProvider.of<TrackBloc>(context).add(
-                          TrackAddMeal(recipieToAdd, groupName, oldGroupName));
+                          TrackAddMeal(recipeToAdd, groupName, oldGroupName));
                       Navigator.of(context).pop();
-                    }, 'Add Recipie');
+                    }, 'Add Recipe');
                   }
                   return Text('');
                 },

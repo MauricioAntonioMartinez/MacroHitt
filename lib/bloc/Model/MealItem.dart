@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import './model.dart';
 
-enum MealOrigin { Track, Recipie, Search }
+enum MealOrigin { Track, Recipe, Search }
 
 class MealItem extends Macro {
   String id;

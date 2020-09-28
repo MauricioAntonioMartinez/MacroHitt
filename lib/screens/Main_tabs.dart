@@ -30,7 +30,7 @@ class _MainScreenState extends State<MainScreen>
   void initState() {
     super.initState();
     Future.delayed(Duration.zero).then((value) {
-      // BlocProvider.of<RecipieBloc>(context).add(LoadRecipies());
+      // BlocProvider.of<RecipeBloc>(context).add(LoadRecipes());
       BlocProvider.of<TrackBloc>(context).add(TrackLoadDay(DateTime.now()));
     });
 

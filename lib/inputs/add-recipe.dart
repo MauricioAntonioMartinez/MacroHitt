@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import './validation.dart';
 
-Map<String, dynamic> createRecipie() {
+Map<String, dynamic> createRecipe() {
   return {
-    'field': 'recipieName',
-    'label': 'Recipie Name',
+    'field': 'recipeName',
+    'label': 'Recipe Name',
     'placeholder': ' - ',
     'validator': textValidator,
     'keyboard': TextInputType.text,

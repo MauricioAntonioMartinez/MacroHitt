@@ -31,19 +31,6 @@ CREATE TABLE meal_group
     groupName TEXT
 );
 
-INSERT INTO meal_group
-    (id,groupName)
-VALUES('1', 'BreakFast');
-INSERT INTO meal_group
-    (id,groupName)
-VALUES('2', 'Lunch');
-INSERT INTO meal_group
-    (id,groupName)
-VALUES('3', 'Snack');
-INSERT INTO meal_group
-    (id,groupName)
-VALUES('4', 'Dinner');
-
 
 CREATE TABLE track_meal
 (
@@ -62,8 +49,8 @@ CREATE TABLE track_meal
 (id) ,
     FOREIGN KEY
 (meal_id)
-       REFERENCES mealitem
-(id)
+       REFERENCES mealitem 
+(id) ON DELETE CASCADE
 );
 
 
@@ -82,30 +69,30 @@ INSERT INTO goal
 VALUES('1', 1, 'MyGoal', 180, 250, 60);
 
 
-CREATE TABLE recipie
+CREATE TABLE recipe
 (
     id TEXT PRIMARY KEY,
-    recipieName TEXT,
+    recipeName TEXT,
     protein REAL,
     carbs REAL,
     fats REAL
 );
 
 
-CREATE TABLE recipie_meal
+CREATE TABLE recipe_meal
 (
     id TEXT PRIMARY KEY ,
     meal_id TEXT NOT NULL,
-    recipie_id TEXT NOT NULL,
+    recipe_id TEXT NOT NULL,
     qty REAL NOT NULL,
     FOREIGN KEY
-(recipie)
-       REFERENCES recipie
+(recipe)
+       REFERENCES recipe
 (id) ,
     FOREIGN KEY
 (meal_id)
-       REFERENCES mealitem
-(id)
+       REFERENCES mealitem 
+(id) ON DELETE CASCADE
 );
 
 

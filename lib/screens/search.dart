@@ -25,10 +25,10 @@ class _SearchState extends State<Search> {
     super.initState();
     Future.delayed(Duration.zero).then((_) {
       origin = ModalRoute.of(context).settings.arguments as MealOrigin;
-      final recipieState = BlocProvider.of<RecipieBloc>(context).state;
+      final recipeState = BlocProvider.of<RecipeBloc>(context).state;
       final mealsState = BlocProvider.of<MealBloc>(context).state;
-      if (recipieState is Recipies) {
-        meals = [...recipieState.recipies];
+      if (recipeState is Recipes) {
+        meals = [...recipeState.recipes];
       }
       if (mealsState is MealLoadSuccess) {
         meals = [...meals, ...mealsState.myMeals];
