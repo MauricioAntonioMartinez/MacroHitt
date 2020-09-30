@@ -105,7 +105,7 @@ class PreviewActions extends StatelessWidget {
                                         TrackRemoveMeal(meal.id, groupName))
                                     : BlocProvider.of<MealBloc>(context)
                                         .add(MealDelete(meal.id));
-                                Navigator.of(context).pushReplacementNamed('/');
+                                Navigator.of(context).pop();
                               }
                             });
                           }

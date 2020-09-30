@@ -28,17 +28,21 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
       @required this.trackItemRepository,
       @required this.recipeBloc})
       : super(TrackLoading()) {
+    var trackDate = DateTime.now();
+    if (state is TrackLoadDaySuccess) {
+      trackDate = (state as TrackLoadDaySuccess).trackDay.date;
+    }
+
     mealTrackGroupSubscription = mealBloc.listen((state) {
       if (state is MealLoadSuccess) {
-        add(TrackLoadDay(DateTime.now()));
+        add(TrackLoadDay(trackDate));
       }
+    }, onDone: () {
+      print('ON DONE !!!');
     });
     reciperackGroupSubscription = recipeBloc.listen((state) {
-      if (state is AddEditMealRecipe ||
-          state is DeleteMealRecipe ||
-          state is DeleteRecipe ||
-          state is UpdateRecipeName) {
-        add(TrackLoadDay(DateTime.now()));
+      if (state is Recipes) {
+        add(TrackLoadDay(trackDate));
       }
     });
   }
@@ -215,7 +219,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
             oldProtein - oldMealProteinFound - oldMealProtein + mealProtein,
             oldCarbs - oldMealCarbsFound - oldMealCarbs + mealCarbs,
             oldFats - oldMealFatsFound - oldMealFats + mealFats);
-        //TODO: BAD UPDATE IN THE DB WHEN CHANGING MEALS
+
         await trackItemRepository.updateItem(
             trackMealItem, oldGroupId == null ? newGroupId : oldGroupId);
         final indexNewMeal =

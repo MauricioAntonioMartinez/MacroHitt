@@ -30,7 +30,6 @@ class _MealPreviewState extends State<MealPreview> {
 
   @override
   void didChangeDependencies() {
-    print('DEPENDENCIES');
     super.didChangeDependencies();
     if (!isDeleted) {
       mealSelected = ModalRoute.of(context).settings.arguments;

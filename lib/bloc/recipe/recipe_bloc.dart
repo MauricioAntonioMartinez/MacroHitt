@@ -19,18 +19,14 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
   RecipeBloc({this.mealBloc, this.recipeRepository, this.recipeItemRepository})
       : super(RecipeLoading()) {
     var recipeId;
-
-    // if (state is RecipeLoadSuccess){
-
-    // }
-
+    if (state is RecipeLoadSuccess) {
+      recipeId = (state as RecipeLoadSuccess).recipe.id;
+    }
     mealTrackGroupSubscription = mealBloc.listen((state) {
-      if (state is MealLoadSuccess) {
-        if (recipeId !=
-            null) // if we are in edit and want to update the meals if the user changed
-          add(LoadRecipeMeals(''));
-        else
-          add(LoadRecipes()); //Load all the recipes, for search tracking
+      if (state is MealLoadSuccess && recipeId != null) {
+        add(LoadRecipeMeals(recipeId));
+      } else {
+        add(LoadRecipes());
       }
     });
   }
@@ -57,6 +53,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
   }
 
   Stream<RecipeState> _loadRecipes() async* {
+    yield RecipeLoading();
     try {
       final recipes = await recipeRepository.findItems();
       yield Recipes(recipes);

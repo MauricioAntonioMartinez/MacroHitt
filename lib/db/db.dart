@@ -10,15 +10,12 @@ Future<Database> db() async {
   return openDatabase(
     await getPaht(),
     onOpen: (db) async {
-      print(await db.rawQuery('''
-      SELECT 
-    name
-FROM 
-    sqlite_master 
-WHERE 
-    type ='table' AND 
-    name NOT LIKE 'sqlite_%';
-      '''));
+      //await db.delete('track_meal');
+      //await db.delete('recipe');
+      //await db.delete('recipe_meal');
+      // await db.rawQuery('DROP TABLE recipe_meal');
+      // print(await db.query('recipe_meal'));
+      //print(await db.query('track'));
     },
     onCreate: (db, version) async {
       print('CREATE');
@@ -154,7 +151,7 @@ VALUES('1', 1, 'MyGoal', 180, 250, 60);
     FOREIGN KEY
 (recipe_id)
        REFERENCES recipe
-(id) ,
+(id) ON DELETE CASCADE ,
     FOREIGN KEY
 (meal_id)
        REFERENCES mealitem 
