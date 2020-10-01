@@ -81,4 +81,32 @@ class TrackRepository implements CRUD<Track> {
           id: '', date: date, macrosConsumed: Macro(0, 0, 0), meals: {});
     }
   }
+
+  Future<void> updateMacrosTracks(MealItem prevMeal, [MealItem newMeal]) async {
+    final database = await db();
+
+    final tracks = await database.rawQuery('''
+      SELECT protein,carbs,fats,T.id as trackId,qty FROM track T INNER JOIN track_meal M ON T.id = M.track_id WHERE
+        M.meal_id = ?; 
+    ''', [prevMeal.id]);
+
+    for (final track in tracks) {
+      final qty = track['qty'];
+      await database.update(
+          'track',
+          {
+            "protein": track['protein'] -
+                    prevMeal.protein * qty +
+                    newMeal.protein * qty ??
+                0,
+            "carbs":
+                track['carbs'] - prevMeal.carbs * qty + newMeal.carbs * qty ??
+                    0,
+            "fats":
+                track['fats'] - prevMeal.fats * qty + newMeal.fats * qty ?? 0,
+          },
+          where: 'id=?',
+          whereArgs: [track['trackId']]);
+    }
+  }
 }

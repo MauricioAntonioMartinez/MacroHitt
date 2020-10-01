@@ -14,7 +14,10 @@ void main() {
   Bloc.observer = SimpleBlocObserver();
   runApp(BlocProvider(
       create: (context) {
-        return MealBloc(mealItemRepository: MealItemRepository())
+        return MealBloc(
+            mealItemRepository: MealItemRepository(),
+            recipeRepository: RecipeRepository(),
+            trackRepository: TrackRepository())
           ..add(MealLoad());
       },
       child: BlocProvider<RecipeBloc>(

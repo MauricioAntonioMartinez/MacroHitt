@@ -32,16 +32,17 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
     if (state is TrackLoadDaySuccess) {
       trackDate = (state as TrackLoadDaySuccess).trackDay.date;
     }
-
+    var mealSuccess;
     mealTrackGroupSubscription = mealBloc.listen((state) {
       if (state is MealLoadSuccess) {
+        mealSuccess = true;
         add(TrackLoadDay(trackDate));
+      } else {
+        mealSuccess = false;
       }
-    }, onDone: () {
-      print('ON DONE !!!');
     });
     reciperackGroupSubscription = recipeBloc.listen((state) {
-      if (state is Recipes) {
+      if (state is Recipes && mealSuccess) {
         add(TrackLoadDay(trackDate));
       }
     });
@@ -255,18 +256,18 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
 
   Stream<TrackState> _mapTrackDayToState(TrackLoadDay event) async* {
     yield TrackLoading();
-    // if (mealBloc.state is MealLoadSuccess && recipeBloc.state is Recipe) {
-    try {
-      final userMeals = (mealBloc.state as MealLoadSuccess).myMeals;
-      final recipe = (recipeBloc.state as Recipes).recipes;
-      final allMeals = [...userMeals, ...recipe];
-      final track =
-          await trackRepository.findItem(event.date.toString(), allMeals);
-      yield TrackLoadDaySuccess(track);
-    } catch (e) {
-      print(e);
+    if (mealBloc.state is MealLoadSuccess && recipeBloc.state is Recipes) {
+      try {
+        final userMeals = (mealBloc.state as MealLoadSuccess).myMeals;
+        final recipe = (recipeBloc.state as Recipes).recipes;
+        final allMeals = [...userMeals, ...recipe];
+        final track =
+            await trackRepository.findItem(event.date.toString(), allMeals);
+        yield TrackLoadDaySuccess(track);
+      } catch (e) {
+        print(e);
+      }
     }
-    //   }
   }
 
   @override

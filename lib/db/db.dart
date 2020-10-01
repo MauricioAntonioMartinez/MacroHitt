@@ -11,6 +11,7 @@ Future<Database> db() async {
     await getPaht(),
     onOpen: (db) async {
       //await db.delete('track_meal');
+      //await db.delete('track');
       //await db.delete('recipe');
       //await db.delete('recipe_meal');
       // await db.rawQuery('DROP TABLE recipe_meal');

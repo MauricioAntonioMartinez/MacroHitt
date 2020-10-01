@@ -63,6 +63,42 @@ class RecipeRepository {
     }).toList();
   }
 
+  Future<void> updateMacrosRecipe(MealItem prevMeal, [MealItem newMeal]) async {
+    final database = await db();
+    final delete = newMeal == null;
+
+    final recipes = await database.rawQuery('''
+      SELECT protein,carbs,fats,R.id as recipeId,qty FROM recipe R INNER JOIN recipe_meal M ON R.id = M.recipe_id WHERE
+        M.meal_id = ?; 
+    ''', [prevMeal.id]);
+
+    if (delete)
+      await database.delete(
+        'recipe_meal',
+        whereArgs: [prevMeal.id],
+        where: 'meal_id=? ',
+      );
+
+    for (final recipe in recipes) {
+      final qty = recipe['qty'];
+      await database.update(
+          'recipe',
+          {
+            "protein": recipe['protein'] -
+                    prevMeal.protein * qty +
+                    newMeal.protein * qty ??
+                0,
+            "carbs":
+                recipe['carbs'] - prevMeal.carbs * qty + newMeal.carbs * qty ??
+                    0,
+            "fats":
+                recipe['fats'] - prevMeal.fats * qty + newMeal.fats * qty ?? 0,
+          },
+          where: 'id=?',
+          whereArgs: [recipe['recipeId']]);
+    }
+  }
+
   Future<Recipe> findItem(String recipeId, [List<MealItem> userMeals]) async {
     if (recipeId == null) {
       return Recipe(id: '', recipeMeal: '', meals: []);

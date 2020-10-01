@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:HIIT/bloc/Repositories/recipe-repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -15,7 +16,13 @@ var uuid = Uuid();
 
 class MealBloc extends Bloc<MealEvent, MealState> {
   final MealItemRepository mealItemRepository;
-  MealBloc({this.mealItemRepository}) : super(MealLoading());
+  final TrackRepository trackRepository;
+  final RecipeRepository recipeRepository;
+  MealBloc(
+      {@required this.mealItemRepository,
+      @required this.trackRepository,
+      @required this.recipeRepository})
+      : super(MealLoading());
 
   @override
   Stream<MealState> mapEventToState(
@@ -35,10 +42,14 @@ class MealBloc extends Bloc<MealEvent, MealState> {
   Stream<MealState> _deleteMeal(MealDelete event) async* {
     final meals = (state as MealLoadSuccess).myMeals;
     yield MealLoading();
+    // TODO: SOMETHING IS WRONG HERE
     try {
       final mealId = event.id;
       await mealItemRepository.deleteItem(mealId);
-      meals.removeWhere((meal) => meal.id == mealId);
+      final prevMealIndex = meals.indexWhere((meal) => meal.id == mealId);
+      meals.removeAt(prevMealIndex);
+      await recipeRepository.updateMacrosRecipe(meals[prevMealIndex]);
+      await trackRepository.updateMacrosTracks(meals[prevMealIndex]);
       yield MealLoadSuccess(meals);
     } catch (e) {
       MealLoadFailure('CANNOT DELELETE');
@@ -78,6 +89,12 @@ class MealBloc extends Bloc<MealEvent, MealState> {
       await mealItemRepository.updateItem(updatedMeal);
       final indexUpdatedMeal =
           prevMeals.indexWhere((m) => m.id == updatedMeal.id);
+
+      final prevMeal = prevMeals[indexUpdatedMeal];
+
+      await recipeRepository.updateMacrosRecipe(prevMeal, updatedMeal);
+      await trackRepository.updateMacrosTracks(prevMeal, updatedMeal);
+
       prevMeals[indexUpdatedMeal] = updatedMeal;
 
       yield MealLoadSuccess(prevMeals);
