@@ -45,14 +45,15 @@ class MealBloc extends Bloc<MealEvent, MealState> {
     // TODO: SOMETHING IS WRONG HERE
     try {
       final mealId = event.id;
-      await mealItemRepository.deleteItem(mealId);
       final prevMealIndex = meals.indexWhere((meal) => meal.id == mealId);
-      meals.removeAt(prevMealIndex);
+      await mealItemRepository.deleteItem(mealId);
       await recipeRepository.updateMacrosRecipe(meals[prevMealIndex]);
       await trackRepository.updateMacrosTracks(meals[prevMealIndex]);
+      meals.removeAt(prevMealIndex);
       yield MealLoadSuccess(meals);
     } catch (e) {
-      MealLoadFailure('CANNOT DELELETE');
+      print(e);
+      MealLoadFailure('CANNOT DELETE');
     }
   }
 

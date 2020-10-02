@@ -96,14 +96,14 @@ class TrackRepository implements CRUD<Track> {
           'track',
           {
             "protein": track['protein'] -
-                    prevMeal.protein * qty +
-                    newMeal.protein * qty ??
-                0,
-            "carbs":
-                track['carbs'] - prevMeal.carbs * qty + newMeal.carbs * qty ??
-                    0,
-            "fats":
-                track['fats'] - prevMeal.fats * qty + newMeal.fats * qty ?? 0,
+                prevMeal.protein * qty +
+                (newMeal == null ? 0.0 : newMeal.protein) * qty,
+            "carbs": track['carbs'] -
+                prevMeal.carbs * qty +
+                (newMeal == null ? 0.0 : newMeal.carbs) * qty,
+            "fats": track['fats'] -
+                prevMeal.fats * qty +
+                (newMeal == null ? 0.0 : newMeal.fats) * qty,
           },
           where: 'id=?',
           whereArgs: [track['trackId']]);

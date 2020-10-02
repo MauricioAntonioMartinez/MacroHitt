@@ -75,8 +75,8 @@ class RecipeRepository {
     if (delete)
       await database.delete(
         'recipe_meal',
-        whereArgs: [prevMeal.id],
         where: 'meal_id=? ',
+        whereArgs: [prevMeal.id],
       );
 
     for (final recipe in recipes) {
@@ -85,14 +85,14 @@ class RecipeRepository {
           'recipe',
           {
             "protein": recipe['protein'] -
-                    prevMeal.protein * qty +
-                    newMeal.protein * qty ??
-                0,
-            "carbs":
-                recipe['carbs'] - prevMeal.carbs * qty + newMeal.carbs * qty ??
-                    0,
-            "fats":
-                recipe['fats'] - prevMeal.fats * qty + newMeal.fats * qty ?? 0,
+                prevMeal.protein * qty +
+                (newMeal == null ? 0.0 : newMeal.protein) * qty,
+            "carbs": recipe['carbs'] -
+                prevMeal.carbs * qty +
+                (newMeal == null ? 0.0 : newMeal.carbs) * qty,
+            "fats": recipe['fats'] -
+                prevMeal.fats * qty +
+                (newMeal == null ? 0.0 : newMeal.fats) * qty,
           },
           where: 'id=?',
           whereArgs: [recipe['recipeId']]);
