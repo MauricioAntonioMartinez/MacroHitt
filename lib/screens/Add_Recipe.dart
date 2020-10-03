@@ -228,10 +228,9 @@ class _AddRecipeWidgetState extends State<AddRecipeWidget> {
                 content: Text('Saved Successfully'),
                 backgroundColor: Theme.of(context).primaryColor,
               ));
+
               BlocProvider.of<RecipeBloc>(context).add(LoadRecipes());
-              Future.delayed(Duration(seconds: 1)).then((_) {
-                Navigator.of(context).pop();
-              });
+              Navigator.of(context).pop();
             }
             if (state is RecipeDeleteSuccess) Navigator.of(context).pop();
           },

@@ -95,6 +95,8 @@ class MealBloc extends Bloc<MealEvent, MealState> {
 
       await recipeRepository.updateMacrosRecipe(prevMeal, updatedMeal);
       await trackRepository.updateMacrosTracks(prevMeal, updatedMeal);
+      //TODO: when both the recipe and meals that the recipe includes
+      // are in the track besides updating the recipes
 
       prevMeals[indexUpdatedMeal] = updatedMeal;
 

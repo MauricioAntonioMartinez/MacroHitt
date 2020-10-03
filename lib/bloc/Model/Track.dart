@@ -12,22 +12,30 @@ class Track extends Macro {
       : super(
             macrosConsumed.protein, macrosConsumed.carbs, macrosConsumed.fats);
 
-  static Map<MealGroupName, List<MealItem>> trackMealsToItemMeals(
-      List<MealItem> userMeals,
+  static List<Object> trackMealsToItemMeals(List<MealItem> userMeals,
       Map<MealGroupName, List<MealTrack>> mealsTrack) {
     Map<MealGroupName, List<MealItem>> finalMeals = {};
+    var protein = 0.0;
+    var carbs = 0.0;
+    var fats = 0.0;
     mealsTrack.forEach((key, trackMeals) {
       finalMeals[key] = trackMeals.map((mealTrack) {
         final mealItem = userMeals.firstWhere((m) => m.id == mealTrack.id);
         final qty = mealTrack.qty;
         var origin = MealOrigin.Track;
         if (mealTrack.origin == 'Recipe') origin = MealOrigin.Recipe;
+        final carbsMeal = mealItem.carbs * qty;
+        final proteinMeal = mealItem.protein * qty;
+        final fatsMeal = mealItem.fats * qty;
+        protein += proteinMeal;
+        carbs += carbsMeal;
+        fats += fatsMeal;
         return MealItem(
             id: mealItem.id,
             origin: origin,
-            carbs: (mealItem.carbs * qty),
-            protein: mealItem.protein * qty,
-            fats: mealItem.fats * qty,
+            carbs: carbsMeal,
+            protein: proteinMeal,
+            fats: fatsMeal,
             brandName: mealItem.brandName,
             mealName: mealItem.mealName,
             servingName: mealItem.servingName,
@@ -40,7 +48,7 @@ class Track extends Macro {
       }).toList();
     });
 
-    return finalMeals;
+    return [finalMeals, Macro(protein, carbs, fats)];
   }
 
   double get getTotalCalories {

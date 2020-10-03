@@ -40,7 +40,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 1)).then((value) {
+    Future.delayed(Duration.zero).then((value) {
       BlocProvider.of<RecipeBloc>(context).add(LoadRecipes());
     });
   }

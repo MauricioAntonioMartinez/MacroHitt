@@ -69,13 +69,12 @@ class TrackRepository implements CRUD<Track> {
               id: meal['meal_id'], qty: meal['qty'], origin: meal['origin'])
         ];
       });
-      final meals = Track.trackMealsToItemMeals(userMeals, trackMeals);
+      final trackDetails = Track.trackMealsToItemMeals(userMeals, trackMeals);
       return Track(
           id: trackingDay['id'],
           date: date,
-          macrosConsumed: Macro(trackingDay['protein'], trackingDay['carbs'],
-              trackingDay['fats']),
-          meals: meals);
+          macrosConsumed: trackDetails[1],
+          meals: trackDetails[0]);
     } else {
       return Track(
           id: '', date: date, macrosConsumed: Macro(0, 0, 0), meals: {});

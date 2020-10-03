@@ -54,7 +54,7 @@ class RecipeRepository {
           servingName: 'serving',
           brandName: "",
           carbs: r['carbs'],
-          fats: r['carbs'],
+          fats: r['fats'],
           protein: r['protein'],
           origin: MealOrigin.Recipe,
           mealName: r['recipeName'],
