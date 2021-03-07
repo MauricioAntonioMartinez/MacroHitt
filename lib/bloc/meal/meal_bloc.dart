@@ -42,13 +42,11 @@ class MealBloc extends Bloc<MealEvent, MealState> {
   Stream<MealState> _deleteMeal(MealDelete event) async* {
     final meals = (state as MealLoadSuccess).myMeals;
     yield MealLoading();
-    // TODO: SOMETHING IS WRONG HERE
     try {
       final mealId = event.id;
       final prevMealIndex = meals.indexWhere((meal) => meal.id == mealId);
       await mealItemRepository.deleteItem(mealId);
       await recipeRepository.updateMacrosRecipe(meals[prevMealIndex]);
-      await trackRepository.updateMacrosTracks(meals[prevMealIndex]);
       meals.removeAt(prevMealIndex);
       yield MealLoadSuccess(meals);
     } catch (e) {
@@ -90,14 +88,8 @@ class MealBloc extends Bloc<MealEvent, MealState> {
       await mealItemRepository.updateItem(updatedMeal);
       final indexUpdatedMeal =
           prevMeals.indexWhere((m) => m.id == updatedMeal.id);
-
       final prevMeal = prevMeals[indexUpdatedMeal];
-
       await recipeRepository.updateMacrosRecipe(prevMeal, updatedMeal);
-      await trackRepository.updateMacrosTracks(prevMeal, updatedMeal);
-      //TODO: when both the recipe and meals that the recipe includes
-      // are in the track besides updating the recipes
-
       prevMeals[indexUpdatedMeal] = updatedMeal;
 
       yield MealLoadSuccess(prevMeals);

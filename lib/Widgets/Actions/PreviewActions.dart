@@ -1,3 +1,4 @@
+import 'package:HIIT/bloc/Track/track_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -78,7 +79,7 @@ class PreviewActions extends StatelessWidget {
                                           'Do you really want to delete this meal?',
                                           style: Theme.of(context)
                                               .textTheme
-                                              .subtitle),
+                                              .subtitle2),
                                       actions: <Widget>[
                                         BlocListener<TrackBloc, TrackState>(
                                           listener: (context, state) {},

@@ -15,7 +15,7 @@ class MealItemSlimDetails extends StatelessWidget {
     return ListTile(
       title: Text(
         mealItem.mealName,
-        style: Theme.of(context).textTheme.subtitle,
+        style: Theme.of(context).textTheme.subtitle2,
       ),
       subtitle: Row(
         children: <Widget>[

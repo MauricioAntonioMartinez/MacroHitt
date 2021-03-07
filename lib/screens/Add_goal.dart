@@ -1,3 +1,4 @@
+import 'package:HIIT/bloc/Track/track_bloc.dart';
 import 'package:flutter/material.dart';
 import '../bloc/Model/model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -76,7 +77,7 @@ class _AddGoalWidgetState extends State<AddGoalWidget> {
               Container(
                 width: 120,
                 child: Text(e['label'],
-                    style: Theme.of(context).textTheme.subtitle),
+                    style: Theme.of(context).textTheme.subtitle2),
               ),
               Container(
                 width: 200,
@@ -114,7 +115,7 @@ class _AddGoalWidgetState extends State<AddGoalWidget> {
         child: Container(
           child: Text(
             title,
-            style: Theme.of(context).textTheme.subhead,
+            style: Theme.of(context).textTheme.subtitle1,
           ),
           padding: EdgeInsets.all(10),
         ),
@@ -140,7 +141,7 @@ class _AddGoalWidgetState extends State<AddGoalWidget> {
                           builder: (context) => AlertDialog(
                                 title: Text('Do you really delete this goal?',
                                     style:
-                                        Theme.of(context).textTheme.subtitle),
+                                        Theme.of(context).textTheme.subtitle2),
                                 actions: <Widget>[
                                   BlocListener<TrackBloc, TrackState>(
                                     listener: (context, state) {},
@@ -219,7 +220,7 @@ class _AddGoalWidgetState extends State<AddGoalWidget> {
                           child: FlatButton(
                             child: Text(
                                 _isEditMode ? 'Update Meal' : 'Start hitt it',
-                                style: Theme.of(context).textTheme.subtitle),
+                                style: Theme.of(context).textTheme.subtitle2),
                             onPressed: () {
                               saveForm();
                             },

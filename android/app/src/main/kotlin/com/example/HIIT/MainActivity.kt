@@ -1,4 +1,4 @@
-package com.example.HIIT
+package com.mcuve.MACROHIIT
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -29,7 +29,7 @@ class MainDrawer extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Container(
-              color: Theme.of(context).primaryColorDark,
+              color: Theme.of(context).primaryColor,
               width: double.infinity,
               padding: EdgeInsets.all(20),
               child: Text(
@@ -68,7 +68,7 @@ class MainDrawer extends StatelessWidget {
                                 },
                                 title: Text(
                                   e['nav'],
-                                  style: Theme.of(context).textTheme.subhead,
+                                  style: Theme.of(context).textTheme.subtitle1,
                                 )),
                             Divider()
                           ],

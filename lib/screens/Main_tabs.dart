@@ -1,4 +1,5 @@
 import 'package:HIIT/bloc/Model/GoalItem.dart';
+import 'package:HIIT/bloc/Track/track_bloc.dart';
 import 'package:HIIT/screens/Add_goal.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -159,7 +160,7 @@ class _MainScreenState extends State<MainScreen>
             index: _currentIndex,
             items: <Widget>[
               Icon(
-                Icons.settings,
+                Icons.food_bank_outlined,
                 size: 30,
               ),
               Icon(Icons.calendar_today, size: 30),

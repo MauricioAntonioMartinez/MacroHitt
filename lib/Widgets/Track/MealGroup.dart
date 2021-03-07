@@ -28,13 +28,13 @@ class MealGroup extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(10),
             decoration:
-                BoxDecoration(color: Theme.of(context).primaryColorLight),
+                BoxDecoration(color: Theme.of(context).primaryColor),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(grpName, style: Theme.of(context).textTheme.subhead),
+                Text(grpName, style: Theme.of(context).textTheme.subtitle1),
                 Text('${totalCals.toStringAsFixed(1)} Kcal',
-                    style: Theme.of(context).textTheme.subhead),
+                    style: Theme.of(context).textTheme.subtitle1),
               ],
             )),
       Column(

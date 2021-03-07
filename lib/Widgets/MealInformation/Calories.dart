@@ -13,7 +13,8 @@ class Calorie extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GoalBloc, GoalState>(builder: (context, state) {
       if (state is GoalSuccess) {
-        final goals = state.goals[0];
+        final goals = state.activeGoal;
+        print(goals.protein);
         final consumedPercentage =
             macrosConsumed.getCalories / goals.getCalories;
         return LayoutBuilder(
@@ -28,12 +29,12 @@ class Calorie extends StatelessWidget {
                   children: <Widget>[
                     Container(
                       width: double.infinity,
-                      color: Theme.of(context).primaryColorLight,
+                      color: Color(0xFF00E5FF) ,
                       height: 1,
                     ),
                     Container(
                       width: cons.maxWidth * consumedPercentage,
-                      color: Theme.of(context).primaryColorDark,
+                      color: Colors.blueAccent,
                       height: 1,
                     )
                   ],

@@ -1,3 +1,4 @@
+import 'package:HIIT/Widgets/Actions/AddRecipeButton.dart';
 import 'package:HIIT/Widgets/Meal/MealItemDismissiable.dart';
 import 'package:HIIT/Widgets/MealInformation/MacrosSlim.dart';
 import 'package:HIIT/Widgets/MealInformation/MealItemSlimDetails.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../Widgets/Meal/QtyInput.dart';
-import '../Widgets/UI/BottomButton.dart';
 import '../Widgets/UI/Header.dart';
 import '../Widgets/UI/TextField.dart';
 import '../Widgets/UI/bottomModalSheet.dart';
@@ -41,9 +41,7 @@ class _AddRecipeWidgetState extends State<AddRecipeWidget> {
       final args =
           ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
       mode = args['mode'];
-
       servingSize = args['servingSize'] == null ? 1.0 : args['servingSize'];
-
       final _oldGroupName = args['groupName'];
       groupName =
           _oldGroupName != null ? _oldGroupName : MealGroupName.BreakFast;
@@ -79,6 +77,7 @@ class _AddRecipeWidgetState extends State<AddRecipeWidget> {
             isEditMode: true,
             props: _recipeName,
             onChange: (val) {
+              if(mode == RecipeMode.Create)
               setState(() {
                 _recipeName['value'] = val;
               });
@@ -102,7 +101,40 @@ class _AddRecipeWidgetState extends State<AddRecipeWidget> {
         context: context);
   }
 
-  Widget _addInputs(Recipe recipe) {
+  void _actionHandler(){
+                  if (mode == RecipeMode.Create)
+                    saveForm();
+                  else
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: Text(
+                                  'Do you really want to remove this recipe?',
+                                  style: Theme.of(context).textTheme.subtitle2),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: Text('Yes'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                ),
+                                FlatButton(
+                                  child: Text('No',
+                                      style: TextStyle(color: Colors.red)),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                )
+                              ],
+                            )).then((isDeleted) {
+                      if (isDeleted)
+                        BlocProvider.of<RecipeBloc>(context)
+                            .add(DeleteRecipe(recipeId));
+                    });
+                
+  }
+
+  Widget _trackInputs(Recipe recipe) {
     return buildExpanend(
         Expanded(
             child: GestureDetector(
@@ -149,7 +181,7 @@ class _AddRecipeWidgetState extends State<AddRecipeWidget> {
     switch (mode) {
       case RecipeMode.Add:
         text = recipe.recipeMeal;
-        inputs = _addInputs(recipe);
+        inputs = _trackInputs(recipe);
         break;
       case RecipeMode.Create:
         text = "Name your Recipe";
@@ -177,37 +209,7 @@ class _AddRecipeWidgetState extends State<AddRecipeWidget> {
                 color: Colors.white,
                 iconSize: 35,
                 enableFeedback: true,
-                onPressed: () {
-                  if (mode == RecipeMode.Create)
-                    saveForm();
-                  else
-                    showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                              title: Text(
-                                  'Do you really want to remove this recipe?',
-                                  style: Theme.of(context).textTheme.subtitle),
-                              actions: <Widget>[
-                                FlatButton(
-                                  child: Text('Yes'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop(true);
-                                  },
-                                ),
-                                FlatButton(
-                                  child: Text('No',
-                                      style: TextStyle(color: Colors.red)),
-                                  onPressed: () {
-                                    Navigator.of(context).pop(false);
-                                  },
-                                )
-                              ],
-                            )).then((isDeleted) {
-                      if (isDeleted)
-                        BlocProvider.of<RecipeBloc>(context)
-                            .add(DeleteRecipe(recipeId));
-                    });
-                }),
+                onPressed: _actionHandler),
             if (mode == RecipeMode.Edit || mode == RecipeMode.Add)
               IconButton(
                   icon:
@@ -238,6 +240,10 @@ class _AddRecipeWidgetState extends State<AddRecipeWidget> {
             if (state is RecipeLoadSuccess) {
               final meals = state.recipe.meals;
               final recipe = state.recipe;
+              final carbs = recipe.getCarbs;
+              final fats = recipe.getFats;
+              final protein = recipe.getProtein;
+              final cals = recipe.getTotalCalories;
 
               return SingleChildScrollView(
                   child: Column(
@@ -246,17 +252,16 @@ class _AddRecipeWidgetState extends State<AddRecipeWidget> {
                   Divider(),
                   MacrosSlim(
                     calories: mode == RecipeMode.Edit
-                        ? recipe.getTotalCalories
-                        : recipe.getTotalCalories * servingSize,
+                        ? cals: cals * servingSize,
                     carbs: mode == RecipeMode.Edit
-                        ? recipe.getCarbs
-                        : recipe.getCarbs * servingSize,
+                        ? carbs
+                        : carbs * servingSize,
                     fats: mode == RecipeMode.Edit
-                        ? recipe.getFats
-                        : recipe.getFats * servingSize,
+                        ? fats
+                        : fats * servingSize,
                     protein: mode == RecipeMode.Edit
-                        ? recipe.getProtein
-                        : recipe.getProtein * servingSize,
+                        ? protein
+                        : protein * servingSize,
                   ),
                   Divider(),
                   ...meals
@@ -304,29 +309,8 @@ class _AddRecipeWidgetState extends State<AddRecipeWidget> {
                   )
                 : null,
         bottomNavigationBar: mode == RecipeMode.Add
-            ? BlocBuilder<RecipeBloc, RecipeState>(
-                builder: (context, state) {
-                  if (state is RecipeLoadSuccess) {
-                    final recipe = state.recipe;
-                    return BottomButton(() {
-                      final recipeToAdd = MealItem(
-                          servingName: 'Serving(s)',
-                          servingSize: servingSize,
-                          carbs: servingSize * recipe.getCarbs,
-                          protein: servingSize * recipe.getProtein,
-                          fats: servingSize * recipe.getFats,
-                          mealName: state.recipe.recipeMeal,
-                          origin: MealOrigin.Recipe,
-                          id: state.recipe.id);
-
-                      BlocProvider.of<TrackBloc>(context).add(
-                          TrackAddMeal(recipeToAdd, groupName, oldGroupName));
-                      Navigator.of(context).pop();
-                    }, 'Add Recipe');
-                  }
-                  return Text('');
-                },
-              )
+            ? AddRecipeButton(servingSize: servingSize, groupName: groupName, oldGroupName: oldGroupName)
             : null);
   }
 }
+

@@ -63,7 +63,17 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
   }
 
   Stream<RecipeState> _updateRecipeName(UpdateRecipeName event) async* {
-    //TODO: implement updating the name in edit mode in runtime
+      final recipe =  (state as RecipeLoadSuccess).recipe;
+      yield RecipeLoading();
+    try {
+      final newName  = event.recipeName;
+      recipe.recipeMeal=newName;
+      
+      await recipeRepository.changeRecipeName(newName, recipe.id);
+      yield RecipeLoadSuccess(recipe);
+    }catch(e) { 
+      yield RecipeLoadFailure('Cannto update the recipe meal');
+    }
   }
 
   Stream<RecipeState> _deleteRecipe() async* {

@@ -9,6 +9,7 @@ import './BlocObserver.dart';
 import './bloc/bloc.dart';
 import './screens/index.dart';
 import 'bloc/Repositories/index.dart';
+import 'bloc/Track/track_bloc.dart';
 
 void main() {
   Bloc.observer = SimpleBlocObserver();
@@ -64,29 +65,29 @@ class _MyAppState extends State<MyApp> {
         title: 'Macro Hitt',
         theme: ThemeData(
             fontFamily: 'Questrial',
-            primarySwatch: Colors.teal,
+            primaryColor: Color(0xFF00E5FF),
             accentColor: Colors.blueAccent,
             textTheme: ThemeData.light().textTheme.copyWith(
                 caption: TextStyle(fontSize: 16),
-                title: TextStyle(
+                headline6: TextStyle(
                     fontFamily: 'NotoSans',
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Color.fromRGBO(204, 0, 11, 0.8)),
-                subtitle: TextStyle(
+                subtitle2: TextStyle(
                     fontSize: 16,
                     color: Colors.black,
                     fontWeight: FontWeight.w300,
                     fontFamily: 'Questrial'),
-                subhead: TextStyle(
+                subtitle1: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Questrial'),
-                body2: TextStyle(
+                bodyText1: TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.bold,
-                    color: Colors.teal),
-                body1: TextStyle(fontSize: 16, fontWeight: FontWeight.w100))),
+                    color: Color(0xFF00E5FF)),
+                bodyText2: TextStyle(fontSize: 16, fontWeight: FontWeight.w100))),
         home: MainScreen(),
         routes: {
           Search.routeName: (ctx) => Search(),

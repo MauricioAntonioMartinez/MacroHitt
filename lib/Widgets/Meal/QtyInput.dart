@@ -13,7 +13,7 @@ class QtyInput extends StatelessWidget {
           padding: EdgeInsets.all(10),
           color: Theme.of(context).primaryColor,
           child:
-              Text('New Quantity', style: Theme.of(context).textTheme.subhead),
+              Text('New Quantity', style: Theme.of(context).textTheme.subtitle1),
         ),
         Container(
           width: 100,

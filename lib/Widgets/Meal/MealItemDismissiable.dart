@@ -1,3 +1,4 @@
+import 'package:HIIT/bloc/Track/track_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,7 +32,7 @@ class DismissiableMeal extends StatelessWidget {
               context: context,
               builder: (context) => AlertDialog(
                     title: Text('Do you really want to remove this meal?',
-                        style: Theme.of(context).textTheme.subtitle),
+                        style: Theme.of(context).textTheme.subtitle2),
                     actions: <Widget>[
                       FlatButton(
                         child: Text('Yes'),

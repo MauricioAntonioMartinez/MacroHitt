@@ -23,6 +23,17 @@ class RecipeRepository {
     return Recipe(id: recipe.id, recipeMeal: recipe.recipeMeal, meals: []);
   }
 
+  Future<void> changeRecipeName(String newName,String recipeId) async { 
+    final database = await db();
+     await database.update(
+        'recipe',
+        {
+          'recipeName': newName
+        },
+        where: 'id=?',
+        whereArgs: [recipeId]);
+  }
+
   Future<void> deleteItem(String recipeId) async {
     final database = await db();
     await database

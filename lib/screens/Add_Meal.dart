@@ -86,7 +86,7 @@ class _AddMealState extends State<AddMeal> {
               Container(
                 width: 120,
                 child: Text(e['label'],
-                    style: Theme.of(context).textTheme.subtitle),
+                    style: Theme.of(context).textTheme.subtitle2),
               ),
               Container(
                 width: 200,
@@ -124,7 +124,7 @@ class _AddMealState extends State<AddMeal> {
         child: Container(
           child: Text(
             title,
-            style: Theme.of(context).textTheme.subhead,
+            style: Theme.of(context).textTheme.subtitle1,
           ),
           padding: EdgeInsets.all(10),
         ),
@@ -142,7 +142,7 @@ class _AddMealState extends State<AddMeal> {
           listener: (context, state) {
             if (state is MealLoadSuccess) {
               if (_isEditMode) return Navigator.of(context).pop(mealSelected);
-              Scaffold.of(context).showSnackBar(SnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Theme.of(context).primaryColor,
                 content: Text('Successfully Added'),
               ));
@@ -170,9 +170,9 @@ class _AddMealState extends State<AddMeal> {
                         width: double.infinity,
                         decoration: BoxDecoration(
                             color: Theme.of(context).primaryColor),
-                        child: FlatButton(
+                        child: TextButton(
                           child: Text(_isEditMode ? 'Update Meal' : 'Add Meal',
-                              style: Theme.of(context).textTheme.subtitle),
+                              style: Theme.of(context).textTheme.subtitle2),
                           onPressed: () {
                             saveForm();
                           },

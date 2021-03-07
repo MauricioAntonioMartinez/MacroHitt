@@ -26,7 +26,7 @@ void bottomModalSheet(
                           padding: EdgeInsets.all(8),
                           child: Text(
                             i.toString().split(splitPart)[1],
-                            style: Theme.of(context).textTheme.subtitle,
+                            style: Theme.of(context).textTheme.subtitle2,
                           ),
                         ),
                         Container(width: double.infinity, child: Divider())

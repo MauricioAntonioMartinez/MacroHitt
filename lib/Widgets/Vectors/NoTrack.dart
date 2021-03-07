@@ -16,7 +16,7 @@ class NoTrack extends StatelessWidget {
               child: Text(
                 'Start Tracking Now',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.body2,
+                style: Theme.of(context).textTheme.bodyText1,
               ),
             ),
             SizedBox(

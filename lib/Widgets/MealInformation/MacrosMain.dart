@@ -66,11 +66,11 @@ class Macros extends StatelessWidget {
                                         : goals.protein -
                                             macrosConsumed.protein)
                                     .toStringAsFixed(1),
-                                style: Theme.of(context).textTheme.title,
+                                style: Theme.of(context).textTheme.headline6,
                               ),
                               Text(
                                 'Protein',
-                                style: Theme.of(context).textTheme.subtitle,
+                                style: Theme.of(context).textTheme.subtitle2,
                               )
                             ]),
                           ),
@@ -88,11 +88,11 @@ class Macros extends StatelessWidget {
                                         ? macrosConsumed.fats
                                         : goals.fats - macrosConsumed.fats)
                                     .toStringAsFixed(1),
-                                style: Theme.of(context).textTheme.title,
+                                style: Theme.of(context).textTheme.headline6,
                               ),
                               Text(
                                 'Fats',
-                                style: Theme.of(context).textTheme.subtitle,
+                                style: Theme.of(context).textTheme.subtitle2,
                               )
                             ]),
                           ),
@@ -106,11 +106,11 @@ class Macros extends StatelessWidget {
                                         ? macrosConsumed.carbs
                                         : goals.carbs - macrosConsumed.carbs)
                                     .toStringAsFixed(1),
-                                style: Theme.of(context).textTheme.title,
+                                style: Theme.of(context).textTheme.headline6,
                               ),
                               Text(
                                 'Carbs',
-                                style: Theme.of(context).textTheme.subtitle,
+                                style: Theme.of(context).textTheme.subtitle2,
                               )
                             ]),
                           ),

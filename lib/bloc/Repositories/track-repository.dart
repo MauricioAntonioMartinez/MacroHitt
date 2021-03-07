@@ -81,31 +81,31 @@ class TrackRepository implements CRUD<Track> {
     }
   }
 
-  Future<void> updateMacrosTracks(MealItem prevMeal, [MealItem newMeal]) async {
-    final database = await db();
+  // Future<void> updateMacrosTracks(MealItem prevMeal, [MealItem newMeal]) async {
+  //   final database = await db();
 
-    final tracks = await database.rawQuery('''
-      SELECT protein,carbs,fats,T.id as trackId,qty FROM track T INNER JOIN track_meal M ON T.id = M.track_id WHERE
-        M.meal_id = ?; 
-    ''', [prevMeal.id]);
+  //   final tracks = await database.rawQuery('''
+  //     SELECT protein,carbs,fats,T.id as trackId,qty FROM track T INNER JOIN track_meal M ON T.id = M.track_id WHERE
+  //       M.meal_id = ?; 
+  //   ''', [prevMeal.id]);
 
-    for (final track in tracks) {
-      final qty = track['qty'];
-      await database.update(
-          'track',
-          {
-            "protein": track['protein'] -
-                prevMeal.protein * qty +
-                (newMeal == null ? 0.0 : newMeal.protein) * qty,
-            "carbs": track['carbs'] -
-                prevMeal.carbs * qty +
-                (newMeal == null ? 0.0 : newMeal.carbs) * qty,
-            "fats": track['fats'] -
-                prevMeal.fats * qty +
-                (newMeal == null ? 0.0 : newMeal.fats) * qty,
-          },
-          where: 'id=?',
-          whereArgs: [track['trackId']]);
-    }
-  }
+  //   for (final track in tracks) {
+  //     final qty = track['qty'];
+  //     await database.update(
+  //         'track',
+  //         {
+  //           "protein": track['protein'] -
+  //               prevMeal.protein * qty +
+  //               (newMeal == null ? 0.0 : newMeal.protein) * qty,
+  //           "carbs": track['carbs'] -
+  //               prevMeal.carbs * qty +
+  //               (newMeal == null ? 0.0 : newMeal.carbs) * qty,
+  //           "fats": track['fats'] -
+  //               prevMeal.fats * qty +
+  //               (newMeal == null ? 0.0 : newMeal.fats) * qty,
+  //         },
+  //         where: 'id=?',
+  //         whereArgs: [track['trackId']]);
+  //   }
+  // }
 }

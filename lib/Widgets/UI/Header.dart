@@ -14,7 +14,7 @@ class Header extends StatelessWidget {
         child: Container(
           child: Text(
             title,
-            style: Theme.of(context).textTheme.subhead,
+            style: Theme.of(context).textTheme.subtitle1,
           ),
           padding: EdgeInsets.all(10),
         ),

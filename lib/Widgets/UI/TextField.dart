@@ -24,7 +24,7 @@ class CustomTextField extends StatelessWidget {
               Container(
                 width: 120,
                 child: Text(props['label'],
-                    style: Theme.of(context).textTheme.subtitle),
+                    style: Theme.of(context).textTheme.subtitle2),
               ),
               Container(
                 width: 200,
